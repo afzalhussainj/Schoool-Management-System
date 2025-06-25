@@ -1,0 +1,2 @@
+# Scholio
+School Management System
