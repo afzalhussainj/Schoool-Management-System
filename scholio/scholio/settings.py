@@ -142,3 +142,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAdminUser',
     ]
 }
+
+DRF_STANDARDIZED_RESPONSE = {
+    "RESPONSE_STANDARDIZER_CLASS": "users.response_standarizer.CustomResponseStandardizer",
+}
