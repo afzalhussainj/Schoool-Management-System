@@ -1,5 +1,5 @@
 from django.db import models
-from schools.models import School
+from schools.models import SchoolBranch
 
 # Create your models here.
 class Principal(models.Model):
@@ -7,7 +7,8 @@ class Principal(models.Model):
     email = models.EmailField(blank=False, unique=True)
     password = models.CharField(max_length=50)
     contact = models.CharField(max_length=25)
-    branch = models.ForeignKey(School, on_delete=models.CASCADE, related_name='principal')
+    branch = models.OneToOneField(SchoolBranch, on_delete=models.PROTECT)
+    branch = models.ForeignKey(SchoolBranch, on_delete=models.CASCADE, related_name='principal')
 
 class SchoolOwner(models.Model):
     name = models.CharField(max_length=20)
@@ -20,4 +21,4 @@ class BranchManager(models.Model):
     email = models.EmailField(blank=False, unique=True)
     password = models.CharField(max_length=50)
     contact = models.CharField(max_length=25)
-    branch = models.ForeignKey(School, on_delete=models.CASCADE, related_name='BranchManager')
+    branch = models.OneToOneField(SchoolBranch, on_delete=models.PROTECT, related_name='BranchManager')
