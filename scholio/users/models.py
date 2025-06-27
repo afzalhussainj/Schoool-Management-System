@@ -20,3 +20,4 @@ class BranchManager(models.Model):
     email = models.EmailField(blank=False, unique=True)
     password = models.CharField(max_length=50)
     contact = models.CharField(max_length=25)
+    branch = models.ForeignKey(School, on_delete=models.CASCADE, related_name='BranchManager')

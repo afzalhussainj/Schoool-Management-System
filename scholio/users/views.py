@@ -5,14 +5,12 @@ from rest_framework import generics, permissions, status
 from schools.serializers import SchoolsSerializer
 from schools.models import School
 from .models import Principal
-from .serializers import PrincipalSerializer
+from .serializers import *
 from rest_framework.views import APIView
-from .utils.ResponseFormat import JsonFormatedResponse
+from ..utils.ResponseFormat import JsonFormatedResponse
+from .permissions import IsBranchManager, IsSchoolOwner
 
 # Create your views here.
-
-class SchoolCreateiew(generics.CreateAPIView):
-    serializer_class = SchoolsSerializer
 
 class SchoolCreateAPIview(APIView):
     # queryset = School.objects.all()
@@ -23,12 +21,25 @@ class SchoolCreateAPIview(APIView):
         serializer = SchoolsSerializer(data=request.data)
         if serializer.is_valid():
             return JsonFormatedResponse(data=serializer.data,message='',status=status.HTTP_201_CREATED)
+        
+class BranchManagerCreateAPIview(APIView):
+    # queryset = School.objects.all()
+    permission_classes = [permissions.IsAdminUser, IsSchoolOwner]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        serializer = BranchManagerSerializer(data=request.data)
+        if serializer.is_valid():
+            return JsonFormatedResponse(data=serializer.data,message='',status=status.HTTP_201_CREATED)
 
 
 
-class PrincipalCreateiew(generics.CreateAPIView):
-    queryset = Principal.objects.all()
-    serializer_class = PrincipalSerializer
-    authentication_classes = [permissions.IsAdminUser]
+class PrincipalCreateAPIview(APIView):
+    # queryset = Principal.objects.all()
+    # serializer_class = PrincipalSerializer
+    authentication_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
 
-# class PrincipalCreateAPIview(APIView):
+    def post(self, request):
+        serializer = BranchManagerSerializer(data=request.data)
+        if serializer.is_valid():
+            return JsonFormatedResponse(data=serializer.data,message='',status=status.HTTP_201_CREATED)
