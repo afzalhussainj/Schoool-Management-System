@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -140,9 +141,13 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAdminUser',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-DRF_STANDARDIZED_RESPONSE = {
-    "RESPONSE_STANDARDIZER_CLASS": "users.response_standarizer.CustomResponseStandardizer",
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Scholio API',
+    'DESCRIPTION': 'API documentation',
+    'VERSION': '1.0.0',
 }
+
