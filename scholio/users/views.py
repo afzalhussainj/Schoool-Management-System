@@ -31,4 +31,4 @@ class PrincipalCreateiew(generics.CreateAPIView):
     serializer_class = PrincipalSerializer
     authentication_classes = [permissions.IsAdminUser]
 
-class PrincipalCreateAPIview(APIView):
+# class PrincipalCreateAPIview(APIView):
