@@ -8,3 +8,15 @@ class Principal(models.Model):
     password = models.CharField(max_length=50)
     contact = models.CharField(max_length=25)
     branch = models.ForeignKey(School, on_delete=models.CASCADE, related_name='principal')
+
+class SchoolOwner(models.Model):
+    name = models.CharField(max_length=20)
+    email = models.EmailField(blank=False, unique=True)
+    password = models.CharField(max_length=50)
+    contact = models.CharField(max_length=25)
+    
+class BranchManager(models.Model):
+    name = models.CharField(max_length=20)
+    email = models.EmailField(blank=False, unique=True)
+    password = models.CharField(max_length=50)
+    contact = models.CharField(max_length=25)
