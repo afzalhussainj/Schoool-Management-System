@@ -23,7 +23,7 @@ class SchoolAPIview(APIView):
             created_school = serializer.save()
             return StandarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully created School "{created_school.get('name')}"',
+                message=f'Successfully created School "{created_school.name}"',
                 status=status.HTTP_201_CREATED)
         else:
             return StandarizedErrorResponse(
@@ -33,7 +33,7 @@ class SchoolAPIview(APIView):
         
     def put(self, request, pk, format=None):
         try:
-            current_school = self.get_object(pk)
+            current_school = School.objects.get(pk=pk)
         except School.DoesNotExist:
             return StandarizedErrorResponse(
                 message="School does'nt exist.",
@@ -44,7 +44,7 @@ class SchoolAPIview(APIView):
             return StandarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully updated School "{updated_school.get('name')}"',
-                status=status.HTTP_201_CREATED)
+                status=status.HTTP_200_OK)
         else:
             return StandarizedErrorResponse(
                 details=serializer.errors,
@@ -62,7 +62,7 @@ class BranchManagerAPIview(APIView):
             created_bm = serializer.save()
             return StandarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully created Branch Manager "{created_bm.get('name')}"',
+                message=f'Successfully created Branch Manager "{created_bm.name}"',
                 status=status.HTTP_201_CREATED)
         else:
             return StandarizedErrorResponse(
@@ -72,7 +72,7 @@ class BranchManagerAPIview(APIView):
 
     def put(self, request, pk, format=None):
         try:
-            current_bm = self.get_object(pk)
+            current_bm = BranchManager.objects.get(pk=pk)
         except BranchManager.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Branch Manager does'nt exist.",
@@ -83,7 +83,7 @@ class BranchManagerAPIview(APIView):
             return StandarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully updated Branch Manager "{updated_bm.get('name')}"',
-                status=status.HTTP_201_CREATED)
+                status=status.HTTP_200_OK)
         else:
             return StandarizedErrorResponse(
                 details=serializer.errors,
@@ -93,7 +93,7 @@ class BranchManagerAPIview(APIView):
 class PrincipalCreateAPIview(APIView):
     # queryset = Principal.objects.all()
     # serializer_class = PrincipalSerializer
-    authentication_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
+    permission_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
 
     def post(self, request):
         serializer = PrincipalSerializer(data=request.data)
@@ -101,7 +101,7 @@ class PrincipalCreateAPIview(APIView):
             created_principal = serializer.save()
             return StandarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully created Principal "{created_principal.get('name')}"',
+                message=f'Successfully created Principal "{created_principal.name}"',
                 status=status.HTTP_201_CREATED)
         else:
             return StandarizedErrorResponse(
@@ -111,7 +111,7 @@ class PrincipalCreateAPIview(APIView):
 
     def put(self, request, pk, format=None):
         try:
-            current_principal = self.get_object(pk)
+            current_principal = Principal.objects.get(pk=pk)
         except Principal.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Principal does'nt exist.",
@@ -122,7 +122,7 @@ class PrincipalCreateAPIview(APIView):
             return StandarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully updated Principal "{updated_principal.get('name')}"',
-                status=status.HTTP_201_CREATED)
+                status=status.HTTP_200_OK)
         else:
             return StandarizedErrorResponse(
                 details=serializer.errors,
