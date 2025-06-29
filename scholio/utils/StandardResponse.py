@@ -1,13 +1,13 @@
 from rest_framework import response
 
-def StandarizedSuccessResponse(data,message,status_code ,status='success'):
+def StandarizedSuccessResponse(message,status_code ,data=None,status='Success'):
     return response({
         'status':status,
+        'data':data,
         'message':message,
-        'data':data
     },status=status_code)
 
-def StandarizedErrorResponse(details,message,status_code ,status=''):
+def StandarizedErrorResponse(message,status_code ,details=None,status='Failure'):
     return response({
         'status':status,
         'message':message,
