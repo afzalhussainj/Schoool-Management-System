@@ -2,54 +2,13 @@
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import generics, permissions, status
-from schools.serializers import SchoolSerializer
-from schools.models import School
 from .models import Principal
 from .serializers import *
 from rest_framework.views import APIView
-from ..utils.StandardResponse import StandarizedErrorResponse, StandarizedSuccessResponse
+from utils.StandardResponse import StandarizedErrorResponse, StandarizedSuccessResponse
 from .permissions import IsBranchManager, IsSchoolOwner
 
 # Create your views here.
-
-class SchoolAPIview(APIView):
-    # queryset = School.objects.all()
-    permission_classes = [permissions.IsAdminUser]
-    authentication_classes = [JWTAuthentication]
-
-    def post(self, request):
-        serializer = SchoolSerializer(data=request.data)
-        if serializer.is_valid():
-            created_school = serializer.save()
-            return StandarizedSuccessResponse(
-                data=serializer.data,
-                message=f'Successfully created School "{created_school.name}"',
-                status=status.HTTP_201_CREATED)
-        else:
-            return StandarizedErrorResponse(
-                details=serializer.errors,
-                message='Failed to create school.',
-                status_code=status.HTTP_400_BAD_REQUEST)
-        
-    def put(self, request, pk, format=None):
-        try:
-            current_school = School.objects.get(pk=pk)
-        except School.DoesNotExist:
-            return StandarizedErrorResponse(
-                message="School does'nt exist.",
-                status_code=status.HTTP_404_NOT_FOUND)
-        serializer = SchoolSerializer(current_school, data=request.data)
-        if serializer.is_valid():
-            updated_school = serializer.save()
-            return StandarizedSuccessResponse(
-                data=serializer.data,
-                message=f'Successfully updated School "{updated_school.get('name')}"',
-                status=status.HTTP_200_OK)
-        else:
-            return StandarizedErrorResponse(
-                details=serializer.errors,
-                message=f'Failed to update school "{current_school.name}".',
-                status_code=status.HTTP_400_BAD_REQUEST)
 
 class BranchManagerAPIview(APIView):
     # queryset = School.objects.all()
@@ -90,7 +49,7 @@ class BranchManagerAPIview(APIView):
                 message=f'Failed to update Branch Manager "{current_bm.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
     
-class PrincipalCreateAPIview(APIView):
+class PrincipalAPIview(APIView):
     # queryset = Principal.objects.all()
     # serializer_class = PrincipalSerializer
     permission_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
@@ -127,5 +86,44 @@ class PrincipalCreateAPIview(APIView):
             return StandarizedErrorResponse(
                 details=serializer.errors,
                 message=f'Failed to update principal "{current_principal.name}".',
+                status_code=status.HTTP_400_BAD_REQUEST)
+ 
+class OwnerAPIview(APIView):
+    # queryset = Principal.objects.all()
+    # serializer_class = PrincipalSerializer
+    permission_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
+
+    def post(self, request):
+        serializer = SchoolOwnerSerializer(data=request.data)
+        if serializer.is_valid():
+            created_owner = serializer.save()
+            return StandarizedSuccessResponse(
+                data=serializer.data,
+                message=f'Successfully created Owner "{created_owner.name}"',
+                status=status.HTTP_201_CREATED)
+        else:
+            return StandarizedErrorResponse(
+                details=serializer.errors,
+                message='Failed to create Owner.',
+                status_code=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk, format=None):
+        try:
+            current_owner = SchoolOwner.objects.get(pk=pk)
+        except SchoolOwner.DoesNotExist:
+            return StandarizedErrorResponse(
+                message="Owner does'nt exist.",
+                status_code=status.HTTP_404_NOT_FOUND)
+        serializer = PrincipalSerializer(current_owner, data=request.data)
+        if serializer.is_valid():
+            updated_owner = serializer.save()
+            return StandarizedSuccessResponse(
+                data=serializer.data,
+                message=f'Successfully updated Owner "{updated_owner.get('name')}"',
+                status=status.HTTP_200_OK)
+        else:
+            return StandarizedErrorResponse(
+                details=serializer.errors,
+                message=f'Failed to update Owner "{current_owner.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
  

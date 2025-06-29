@@ -15,6 +15,7 @@ class SchoolOwner(models.Model):
     email = models.EmailField(blank=False, unique=True)
     password = models.CharField(max_length=50)
     contact = models.CharField(max_length=25)
+    school = models.ForeignKey(SchoolBranch,on_delete=models.CASCADE,related_name='owner')
     
 class BranchManager(models.Model):
     name = models.CharField(max_length=20)
