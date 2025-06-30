@@ -14,6 +14,7 @@ class SchoolAPIview(APIView):
     # queryset = School.objects.all()
     permission_classes = [permissions.IsAdminUser]
     authentication_classes = [JWTAuthentication]
+    serializer_class = SchoolSerializer
 
     def post(self, request):
         serializer = SchoolSerializer(data=request.data)
@@ -22,7 +23,7 @@ class SchoolAPIview(APIView):
             return StandarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully created School "{created_school.name}"',
-                status=status.HTTP_201_CREATED)
+                status_code=status.HTTP_201_CREATED)
         else:
             return StandarizedErrorResponse(
                 details=serializer.errors,
@@ -41,8 +42,8 @@ class SchoolAPIview(APIView):
             updated_school = serializer.save()
             return StandarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully updated School "{updated_school.get('name')}"',
-                status=status.HTTP_200_OK)
+                message=f'Successfully updated School "{updated_school.name}"',
+                status_code=status.HTTP_200_OK)
         else:
             return StandarizedErrorResponse(
                 details=serializer.errors,
