@@ -20,7 +20,7 @@ class BranchManagerAPIview(APIView):
     serializer_class = BranchManagerSerializer
 
     @extend_schema(
-            methods=["POST"],
+            # methods=["POST"],
             request=BranchManagerSerializer,
             # parameters=OpenApiParameter(name='access_token')
             responses={
@@ -44,12 +44,13 @@ class BranchManagerAPIview(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
-            methods=["PUT"],
+            # methods=["PUT"],
             # auth=['JWTAuthentication'],
             request=BranchManagerSerializer,
             responses={
-                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created Branch Manager.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Branch manager.')
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successful.'),
+                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Branch manager.'),
+                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='Branch manager not found.')
             }
     )
     # @api_view(['PUT'])
@@ -80,11 +81,11 @@ class PrincipalAPIview(APIView):
     serializer_class = PrincipalSerializer
 
     @extend_schema(
-            methods=["POST"],
+            # methods=["POST"],
             request=PrincipalSerializer,
             responses={
-                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created Branch Manager.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Branch manager.')
+                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created Principal.'),
+                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Principal.')
             }
     )
     # @api_view(['POST'])
@@ -107,8 +108,9 @@ class PrincipalAPIview(APIView):
             # auth=['JWTAuthentication'],
             request=PrincipalSerializer,
             responses={
-                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created Branch Manager.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Branch manager.')
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successful.'),
+                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to update principal.'),
+                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='BranPrincipalch not found.')
             }
     )
     # @api_view(['PUT'])
@@ -135,15 +137,15 @@ class PrincipalAPIview(APIView):
 class OwnerAPIview(APIView):
     # queryset = Principal.objects.all()
     # serializer_class = PrincipalSerializer
-    permission_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
+    permission_classes = [permissions.IsAdminUser]
     serializer_class = SchoolOwnerSerializer
 
     @extend_schema(
             methods=["POST"],
             request=SchoolOwnerSerializer,
             responses={
-                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created Branch Manager.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Branch manager.')
+                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created school owner.'),
+                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create school owner.')
             }
     )
     # @api_view(['POST'])
@@ -167,8 +169,9 @@ class OwnerAPIview(APIView):
             request=SchoolOwnerSerializer,
             # parameters=opena
             responses={
-                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created Branch Manager.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Branch manager.')
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successful.'),
+                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create school owner.'),
+                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='School owner not found.')
             }
     )
     # @api_view(['PUT'])
