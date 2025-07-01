@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import permissions,status
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -9,14 +8,13 @@ from utils.StandardResponse_serializers import StandarizedErrorResponseSerialize
 from .serializers import *
 from .models import School
 from .permissions import IsBranchManager,IsSchoolOwner
-from rest_framework.response import Response
-
-# Create your views here.
-
 
 class SchoolAPIView(APIView):
-    permission_classes = [permissions.IsAdminUser]
     authentication_classes = [JWTAuthentication]
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [permissions.IsAdminUser()]
 
     @swagger_auto_schema(
         request_body=SchoolSerializer,
@@ -42,10 +40,27 @@ class SchoolAPIView(APIView):
 
     @swagger_auto_schema(
         responses={
-            200: openapi.Response('Successfully Retrieved available Schools.', StandarizedSuccessResponseSerializer),
-        }
+            200: openapi.Response('Successfully Retrieved School.', StandarizedSuccessResponseSerializer),
+        },
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School", type=openapi.TYPE_INTEGER)
+        ],
     )
-    def get(self, request):
+    def get(self, request, pk):
+        queryset = School.objects.get(pk=pk)
+        serializer = SchoolSerializer(queryset)
+        return StandarizedSuccessResponse(
+            data=serializer.data,
+            message='Successfully retrieved School.',
+            status_code=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response('Successfully Retrieved available Schools.', StandarizedSuccessResponseSerializer),
+        },
+    )
+    def list(self, request):
         queryset = School.objects.all()
         serializer = SchoolSerializer(queryset, many=True)
         return StandarizedSuccessResponse(
