@@ -6,6 +6,6 @@ class StandarizedSuccessResponseSerializer(serializers.Serializer):
     data = serializers.DictField()
 
 class StandarizedErrorResponseSerializer(serializers.Serializer):
-    status = serializers.CharField(default='Success')
+    status = serializers.CharField(default='Failure')
     message = serializers.CharField()
     details = serializers.DictField()

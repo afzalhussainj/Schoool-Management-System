@@ -40,6 +40,85 @@ class SchoolCreateAPIview(APIView):
                 message='Failed to create school.',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
+class SchoolRetrieveAllAPIview(APIView):
+    # queryset = School.objects.all()
+    # permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = SchoolSerializer
+
+    @extend_schema(
+            # methods=["POST"],
+            request=SchoolSerializer,
+            # parameters=OpenApiParameter(name='access_token')
+            responses={
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully Retrieved available Schools.'),
+            }
+    )
+
+    def get(self, request):
+        queryset = School.objects.all()
+        serialized_data = SchoolSerializer(data=queryset,many=True)
+        return StandarizedSuccessResponse(
+            data=serialized_data.data,
+            message=f'Successfully retrieved available Schools.',
+                status_code=status.HTTP_200_OK)
+    
+class SchoolRetrieveSpecificAPIview(APIView):
+    # queryset = School.objects.all()
+    # permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = SchoolSerializer
+
+    @extend_schema(
+            # methods=["POST"],
+            request=SchoolSerializer,
+            # parameters=OpenApiParameter(name='access_token')
+            responses={
+                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to retrieve School.'),
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully retrieved School.'),
+            }
+    )
+    def get(self,pk, request):
+        queryset = School.objects.get(pk=pk)
+        if queryset:
+            serialized_data = SchoolSerializer(data=queryset)
+            return StandarizedSuccessResponse(
+                data=serialized_data.data,
+                message=f'Successfully Retrieved School "{queryset.name}"',
+                status_code=status.HTTP_200_OK)
+        else:
+            return StandarizedErrorResponse(
+                message='Failed to retrieve school.',
+                status_code=status.HTTP_404_NOT_FOUND)
+
+class SchoolDeleteAPIview(APIView):
+    # queryset = School.objects.all()
+    permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = SchoolSerializer
+
+    @extend_schema(
+            # methods=["POST"],
+            request=SchoolSerializer,
+            # parameters=OpenApiParameter(name='access_token')
+            responses={
+                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to delete school.'),
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully Deleted School.'),
+            }
+    )
+    def delete(self,pk, request):
+        queryset = School.objects.get(pk=pk)
+        if queryset:
+            name = queryset.name
+            queryset.delete()
+            return StandarizedSuccessResponse(
+                message=f'Successfully Deleted School "{name}"',
+                status_code=status.HTTP_200_OK)
+        else:
+            return StandarizedErrorResponse(
+                message='Failed to delete school.',
+                status_code=status.HTTP_404_NOT_FOUND)
+
 class SchoolUpdateAPIview(APIView):
     # queryset = School.objects.all()
     permission_classes = [permissions.IsAdminUser]
