@@ -1,13 +1,16 @@
 from django.urls import path
+
+# from django.urls import include
 from . import views
+
 
 urlpatterns = [
     # schools
-    path('create/school/', views.SchoolCreateAPIview.as_view(), name='SchoolCreation' ),
-    path('all/schools/', views.SchoolRetrieveAllAPIview.as_view(), name='SchoolRetrivalAll' ),
-    path('school/<int:pk>', views.SchoolRetrieveSpecificAPIview.as_view(), name='SchoolRetrivalSpecific' ),
-    path('update/school/<int:pk>', views.SchoolUpdateAPIview.as_view(), name='SchoolUpdation' ),
-    path('del/school/<int:pk>', views.SchoolDeleteAPIview.as_view(), name='SchoolDelete' ),
+    path('', views.SchoolAPIView.as_view(), name='School' ),
+    # path('all/schools/', views.SchoolRetrieveAllAPIview.as_view(), name='SchoolRetrivalAll' ),
+    # path('school/<int:pk>', views.SchoolRetrieveSpecificAPIview.as_view(), name='SchoolRetrivalSpecific' ),
+    # path('update/school/<int:pk>', views.SchoolUpdateAPIview.as_view(), name='SchoolUpdation' ),
+    # path('del/school/<int:pk>', views.SchoolDeleteAPIview.as_view(), name='SchoolDelete' ),
     
     #branches
     path('create/branch/', views.SchoolBranchCreateAPIview.as_view(), name='SchoolBranchCreation' ),

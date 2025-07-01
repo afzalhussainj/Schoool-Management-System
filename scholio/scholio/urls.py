@@ -21,7 +21,21 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from rest_framework import routers
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Your API",
+        default_version='v1',
+        description="API documentation powered by Swagger",
+        terms_of_service="https://your-terms-of-service-url.com/",
+        contact=openapi.Contact(email="contact@your-api.com"),
+        license=openapi.License(name="Your API License"),
+    ),
+    public=True,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -29,7 +43,5 @@ urlpatterns = [
     path('schools/',include('schools.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    # swagger(OPENAPi 3.0) with spectaculer
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui')
+    path('api-docs/', schema_view.with_ui('swagger', cache_timeout=0), name='api-docs'),
 ]

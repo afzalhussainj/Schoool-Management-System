@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from drf_spectacular.utils import extend_schema,OpenApiResponse,OpenApiParameter
 from utils.StandardResponse import StandarizedErrorResponse, StandarizedSuccessResponse
 from utils.StandardResponse_serializers import StandarizedErrorResponseSerializer,StandarizedSuccessResponseSerializer
+from schools.models import School
 from .models import Principal
 from .serializers import *
 from .permissions import IsBranchManager, IsSchoolOwner
@@ -42,7 +42,121 @@ class BranchManagerCreateAPIview(APIView):
                 details=serializer.errors,
                 message='Failed to create Branch manager.',
                 status_code=status.HTTP_400_BAD_REQUEST)
+
+class BranchManagerRetrieveAllAPIview(APIView):
+    # queryset = School.objects.all()
+    # permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = BranchManagerSerializer
+
+    @extend_schema(
+            # methods=["POST"],
+            request=BranchManagerSerializer,
+            # parameters=OpenApiParameter(name='access_token')
+            responses={
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully Retrieved available Branch Manager.'),
+            }
+    )
+
+    def get(self, request):
+        queryset = BranchManager.objects.all()
+        if queryset:
+            serialized_data = BranchManagerSerializer(data=queryset,many=True)
+            return StandarizedSuccessResponse(
+                data=serialized_data.data,
+                message=f'Successfully retrieved available Branch Managers.',
+                status_code=status.HTTP_200_OK)
+        else:
+            return StandarizedErrorResponse(
+                message='Failed to retrieve Branch Manager.',
+                status_code=status.HTTP_404_NOT_FOUND)
     
+class BranchManagerRetrieveAllSpecificAPIview(APIView):
+    # queryset = School.objects.all()
+    # permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = BranchManagerSerializer
+
+    @extend_schema(
+            # methods=["POST"],
+            request=BranchManagerSerializer,
+            # parameters=OpenApiParameter(name='access_token')
+            responses={
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully Retrieved available School Branche managers.'),
+            }
+    )
+
+    def get(self,pk, request):
+        queryset = BranchManager.objects.get(school=School.objects.get(pk=pk))
+        if queryset:
+            serialized_data = BranchManagerSerializer(data=queryset,many=True)
+            return StandarizedSuccessResponse(
+                data=serialized_data.data,
+                message=f'Successfully retrieved available School Branches.',
+                status_code=status.HTTP_200_OK)
+        else:
+            return StandarizedErrorResponse(
+                message='Failed to retrieve Branch Manager.',
+                status_code=status.HTTP_404_NOT_FOUND)
+
+class BranchManagerRetrieveSpecificAPIview(APIView):
+    # queryset = School.objects.all()
+    # permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = BranchManagerSerializer
+
+    @extend_schema(
+            # methods=["POST"],
+            request=BranchManagerSerializer,
+            # parameters=OpenApiParameter(name='access_token')
+            responses={
+                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to retrieve Branch Manager.'),
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully retrieved Branch Manager.'),
+            }
+    )
+    def get(self,pk, request):
+        queryset = BranchManager.objects.get(pk=pk)
+        if queryset:
+            serialized_data = BranchManagerSerializer(data=queryset)
+            return StandarizedSuccessResponse(
+                data=serialized_data.data,
+                message=f'Successfully Retrieved Branch Manager "{queryset.name}"',
+                status_code=status.HTTP_200_OK)
+        else:
+            return StandarizedErrorResponse(
+                message='Failed to retrieve Branch Manager.',
+                status_code=status.HTTP_404_NOT_FOUND)
+
+class BranchManagerDeleteAPIview(APIView):
+    # queryset = School.objects.all()
+    permission_classes = [permissions.IsAdminUser]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = BranchManagerSerializer
+
+    @extend_schema(
+            # methods=["POST"],
+            request=BranchManagerSerializer,
+            # parameters=OpenApiParameter(name='access_token')
+            responses={
+                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to delete Branch Manager.'),
+                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully Deleted Branch Manager.'),
+            }
+    )
+    def delete(self,pk, request):
+        queryset = BranchManager.objects.get(pk=pk)
+        if queryset:
+            name = queryset.name
+            queryset.delete()
+            return StandarizedSuccessResponse(
+                message=f'Successfully Deleted Branch Manager "{name}"',
+                status_code=status.HTTP_200_OK)
+        else:
+            return StandarizedErrorResponse(
+                message='Failed to delete Branch Manager.',
+                status_code=status.HTTP_404_NOT_FOUND)
+
+
+
 class BranchManagerUpdateAPIview(APIView):
     # queryset = School.objects.all()
     permission_classes = [permissions.IsAdminUser, IsSchoolOwner]
@@ -214,7 +328,9 @@ class OwnerUpdateAPIview(APIView):
                 message=f'Failed to update Owner "{current_owner.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
  
- # combined apiview
+ 
+# combined apiview
+
 # class BranchManagerAPIview(APIView):
 #     # queryset = School.objects.all()
 #     permission_classes = [permissions.IsAdminUser, IsSchoolOwner]

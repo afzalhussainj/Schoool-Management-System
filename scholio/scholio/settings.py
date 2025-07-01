@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'drf_spectacular',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -143,19 +143,7 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.IsAdminUser',
     # ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
-
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Scholio API',
-    'DESCRIPTION': 'API documentation',
-    'VERSION': '1.0.0',
-    'AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-    "SECURITY": [{"BearerAuth": []}],
-}
-
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
