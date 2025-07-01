@@ -1,4 +1,3 @@
-# from rest_framework.decorators import api_view
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -19,15 +18,6 @@ class BranchManagerCreateAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     serializer_class = BranchManagerSerializer
 
-    @extend_schema(
-            # methods=["POST"],
-            request=BranchManagerSerializer,
-            # parameters=OpenApiParameter(name='access_token')
-            responses={
-                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created Branch Manager.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Branch manager.')
-            }
-    )
     # @api_view(['POST'])
     def post(self, request):
         serializer = BranchManagerSerializer(data=request.data)
@@ -49,15 +39,6 @@ class BranchManagerRetrieveAllAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     serializer_class = BranchManagerSerializer
 
-    @extend_schema(
-            # methods=["POST"],
-            request=BranchManagerSerializer,
-            # parameters=OpenApiParameter(name='access_token')
-            responses={
-                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully Retrieved available Branch Manager.'),
-            }
-    )
-
     def get(self, request):
         queryset = BranchManager.objects.all()
         if queryset:
@@ -76,15 +57,6 @@ class BranchManagerRetrieveAllSpecificAPIview(APIView):
     # permission_classes = [permissions.IsAdminUser]
     authentication_classes = [JWTAuthentication]
     serializer_class = BranchManagerSerializer
-
-    @extend_schema(
-            # methods=["POST"],
-            request=BranchManagerSerializer,
-            # parameters=OpenApiParameter(name='access_token')
-            responses={
-                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully Retrieved available School Branche managers.'),
-            }
-    )
 
     def get(self,pk, request):
         queryset = BranchManager.objects.get(school=School.objects.get(pk=pk))
@@ -105,15 +77,6 @@ class BranchManagerRetrieveSpecificAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     serializer_class = BranchManagerSerializer
 
-    @extend_schema(
-            # methods=["POST"],
-            request=BranchManagerSerializer,
-            # parameters=OpenApiParameter(name='access_token')
-            responses={
-                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to retrieve Branch Manager.'),
-                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully retrieved Branch Manager.'),
-            }
-    )
     def get(self,pk, request):
         queryset = BranchManager.objects.get(pk=pk)
         if queryset:
@@ -133,15 +96,6 @@ class BranchManagerDeleteAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     serializer_class = BranchManagerSerializer
 
-    @extend_schema(
-            # methods=["POST"],
-            request=BranchManagerSerializer,
-            # parameters=OpenApiParameter(name='access_token')
-            responses={
-                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to delete Branch Manager.'),
-                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully Deleted Branch Manager.'),
-            }
-    )
     def delete(self,pk, request):
         queryset = BranchManager.objects.get(pk=pk)
         if queryset:
@@ -163,17 +117,6 @@ class BranchManagerUpdateAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     serializer_class = BranchManagerSerializer
 
-    @extend_schema(
-            # methods=["PUT"],
-            # auth=['JWTAuthentication'],
-            request=BranchManagerSerializer,
-            responses={
-                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successful.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Branch manager.'),
-                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='Branch manager not found.')
-            }
-    )
-    # @api_view(['PUT'])
     def put(self, request, pk, format=None):
         try:
             current_bm = BranchManager.objects.get(pk=pk)
@@ -200,15 +143,6 @@ class PrincipalCreateAPIview(APIView):
     permission_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
     serializer_class = PrincipalSerializer
 
-    @extend_schema(
-            # methods=["POST"],
-            request=PrincipalSerializer,
-            responses={
-                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created Principal.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create Principal.')
-            }
-    )
-    # @api_view(['POST'])
     def post(self, request):
         serializer = PrincipalSerializer(data=request.data)
         if serializer.is_valid():
@@ -230,17 +164,6 @@ class PrincipalUpdateAPIview(APIView):
     permission_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
     serializer_class = PrincipalSerializer
 
-    @extend_schema(
-            methods=["PUT"],
-            # auth=['JWTAuthentication'],
-            request=PrincipalSerializer,
-            responses={
-                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successful.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to update principal.'),
-                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='BranPrincipalch not found.')
-            }
-    )
-    # @api_view(['PUT'])
     def put(self, request, pk, format=None):
         try:
             current_principal = Principal.objects.get(pk=pk)
@@ -267,15 +190,6 @@ class OwnerCreateAPIview(APIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = SchoolOwnerSerializer
 
-    @extend_schema(
-            methods=["POST"],
-            request=SchoolOwnerSerializer,
-            responses={
-                201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created school owner.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create school owner.')
-            }
-    )
-    # @api_view(['POST'])
     def post(self, request):
         serializer = SchoolOwnerSerializer(data=request.data)
         if serializer.is_valid():
@@ -296,18 +210,6 @@ class OwnerUpdateAPIview(APIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = SchoolOwnerSerializer
 
-    @extend_schema(
-            methods=["PUT"],
-            # auth=['JWTAuthentication'],
-            request=SchoolOwnerSerializer,
-            # parameters=opena
-            responses={
-                200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successful.'),
-                400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create school owner.'),
-                404:OpenApiResponse(StandarizedErrorResponseSerializer,description='School owner not found.')
-            }
-    )
-    # @api_view(['PUT'])
     def put(self, request, pk, format=None):
         try:
             current_owner = SchoolOwner.objects.get(pk=pk)
