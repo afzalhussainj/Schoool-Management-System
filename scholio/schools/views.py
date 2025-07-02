@@ -11,6 +11,8 @@ from .permissions import IsBranchManager,IsSchoolOwner
 
 class SchoolAPIView(APIView):
     authentication_classes = [JWTAuthentication]
+    queryset = School.objects.filter(isdeleted=False)
+
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -67,14 +69,14 @@ class SchoolpkAPIView(APIView):
     )
     def get(self, request, pk):
         try:
-            queryset = School.objects.get(pk=pk)
+            school = self.queryset.objects.get(pk=pk)
         except:
             return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND
                 )
             
-        serialized_data = SchoolSerializer(queryset)
+        serialized_data = SchoolSerializer(school)
         return StandarizedSuccessResponse(
             data=serialized_data.data,
             message=f'Successfully retrieved Available School.',
@@ -92,7 +94,7 @@ class SchoolpkAPIView(APIView):
     )
     def delete(self, request, pk):
         try:
-            school = School.objects.get(pk=pk)
+            school = self.queryset.objects.get(pk=pk)
         except School.DoesNotExist:
             return StandarizedErrorResponse(
                 message='Failed to delete school.',
@@ -118,7 +120,7 @@ class SchoolpkAPIView(APIView):
     )
     def put(self, request, pk):
         try:
-            school = School.objects.get(pk=pk)
+            school = self.queryset.objects.get(pk=pk)
         except School.DoesNotExist:
             return StandarizedErrorResponse(
                 message="School doesn't exist.",
@@ -142,6 +144,7 @@ class SchoolpkAPIView(APIView):
 
 class SchoolBranchAPIview(APIView):
     authentication_classes = [JWTAuthentication]
+    queryset = SchoolBranch.objects.get(isdeleted=False)
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -197,7 +200,7 @@ class SchoolBranchpkAPIview(APIView):
     )
     def get(self, request, pk):
         try:
-            branch = SchoolBranch.objects.get(pk=pk)
+            branch = self.queryset.objects.get(pk=pk)
         except:
             return StandarizedErrorResponse(
                 message='Failed to retrieve School Branch.',
@@ -223,7 +226,7 @@ class SchoolBranchpkAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            branch = SchoolBranch.objects.get(pk=pk)
+            branch = self.queryset.objects.get(pk=pk)
         except:
             return StandarizedErrorResponse(
                 message='Failed to delete school Branch.',
@@ -247,7 +250,7 @@ class SchoolBranchpkAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_branch = SchoolBranch.objects.get(pk=pk)
+            current_branch = self.queryset.objects.get(pk=pk)
         except SchoolBranch.DoesNotExist:
             return StandarizedErrorResponse(
                 message="School branch does'nt exist.",

@@ -17,6 +17,7 @@ from .permissions import IsBranchManager, IsSchoolOwner
 
 class BranchManagerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
+    queryset = BranchManager.objects.filter(isdeleted=False)
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -72,7 +73,7 @@ class BranchManagerpkAPIview(APIView):
     )
     def get(self, request, pk):
         try:
-            manager = BranchManager.objects.get(pk=pk)
+            manager = self.queryset.objects.get(pk=pk)
         except:
             return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
@@ -95,7 +96,7 @@ class BranchManagerpkAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            manager = BranchManager.objects.get(pk=pk)
+            manager = self.queryset.objects.get(pk=pk)
         except:
             return StandarizedErrorResponse(
                 message='Failed to delete Branch Manager.',
@@ -119,7 +120,7 @@ class BranchManagerpkAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_bm = BranchManager.objects.get(pk=pk)
+            current_bm = self.queryset.objects.get(pk=pk)
         except BranchManager.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Branch Manager does'nt exist.",
@@ -140,6 +141,7 @@ class BranchManagerpkAPIview(APIView):
  
 class PrincipalAPIview(APIView):
     authentication_classes = [JWTAuthentication]
+    queryset = Principal.objects.filter(isdeleted=False)
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -195,7 +197,7 @@ class PrincipalpkAPIview(APIView):
     )
     def get(self, request, pk):
         try:
-            principal = Principal.objects.get(pk=pk)
+            principal = self.queryset.objects.get(pk=pk)
         except:
             return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
@@ -218,7 +220,7 @@ class PrincipalpkAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            principal = Principal.objects.get(pk=pk)
+            principal = self.queryset.objects.get(pk=pk)
         except Principal.DoesNotExist:
             return StandarizedErrorResponse(
                 message='Failed to delete school.',
@@ -244,7 +246,7 @@ class PrincipalpkAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_principal = Principal.objects.get(pk=pk)
+            current_principal = self.queryset.objects.get(pk=pk)
         except Principal.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Principal does'nt exist.",
@@ -265,6 +267,7 @@ class PrincipalpkAPIview(APIView):
 
 class OwnerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
+    queryset = SchoolOwner.objects.filter(isdeleted=False)
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -293,7 +296,7 @@ class OwnerAPIview(APIView):
 
 class OwnerpkAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    quaryset = SchoolOwner.objects.filter(isdeleted=False)
+    queryset = SchoolOwner.objects.filter(isdeleted=False)
 
     def get_permissions(self):
         if self.request.method == 'PUT':
@@ -319,7 +322,7 @@ class OwnerpkAPIview(APIView):
     )
     def get(self, request, pk):
         try:
-            owner = SchoolOwner.objects.get(pk=pk)
+            owner = self.queryset.objects.get(pk=pk)
         except:
             return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
@@ -344,7 +347,7 @@ class OwnerpkAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            school_owner = School.objects.get(pk=pk)
+            school_owner = self.queryset.objects.get(pk=pk)
         except SchoolOwner.DoesNotExist:
             return StandarizedErrorResponse(
                 message='Failed to delete school.',
@@ -370,7 +373,7 @@ class OwnerpkAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_owner = SchoolOwner.objects.get(pk=pk)
+            current_owner = self.queryset.objects.get(pk=pk)
         except SchoolOwner.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Owner does'nt exist.",
