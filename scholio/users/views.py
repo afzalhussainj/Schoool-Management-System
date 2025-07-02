@@ -64,8 +64,9 @@ class BranchManagerAPIview(APIView):
     def get(self, request):
         pk = request.GET.get('pk')
         if pk:
-            queryset = BranchManager.objects.get(pk=pk)
-            if not queryset:
+            try:
+                queryset = BranchManager.objects.get(pk=pk,isdeleted=False)
+            except:
                 return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
@@ -89,17 +90,18 @@ class BranchManagerAPIview(APIView):
         }
     )
     def delete(self, request, pk):
-        queryset = BranchManager.objects.get(pk=pk)
-        if queryset:
-            name = queryset.name
-            queryset.delete()
-            return StandarizedSuccessResponse(
-                message=f'Successfully Deleted Branch Manager "{name}"',
-                status_code=status.HTTP_200_OK)
-        else:
+        try:
+            queryset = BranchManager.objects.get(pk=pk,isdeleted=False)
+        except:
             return StandarizedErrorResponse(
                 message='Failed to delete Branch Manager.',
                 status_code=status.HTTP_404_NOT_FOUND)
+        
+        name = queryset.name
+        queryset.isdeleted = True
+        return StandarizedSuccessResponse(
+            message=f'Successfully Deleted Branch Manager "{name}"',
+            status_code=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         request_body=BranchManagerSerializer,
@@ -114,7 +116,7 @@ class BranchManagerAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_bm = BranchManager.objects.get(pk=pk)
+            current_bm = BranchManager.objects.get(pk=pk,isdeleted=False)
         except BranchManager.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Branch Manager does'nt exist.",
@@ -181,8 +183,9 @@ class PrincipalAPIview(APIView):
     def get(self, request):
         pk = request.GET.get('pk')
         if pk:
-            queryset = Principal.objects.get(pk=pk)
-            if not queryset:
+            try:
+                queryset = Principal.objects.get(pk=pk,isdeleted=False)
+            except:
                 return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
@@ -207,7 +210,7 @@ class PrincipalAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            principal = Principal.objects.get(pk=pk)
+            principal = Principal.objects.get(pk=pk,isdeleted=False)
         except Principal.DoesNotExist:
             return StandarizedErrorResponse(
                 message='Failed to delete school.',
@@ -215,7 +218,7 @@ class PrincipalAPIview(APIView):
             )
 
         name = principal.name
-        principal.delete()
+        principal.isdeleted = True
         return StandarizedSuccessResponse(
             message=f'Successfully Deleted School "{name}"',
             status_code=status.HTTP_200_OK
@@ -234,7 +237,7 @@ class PrincipalAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_principal = Principal.objects.get(pk=pk)
+            current_principal = Principal.objects.get(pk=pk,isdeleted=False)
         except Principal.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Principal does'nt exist.",
@@ -293,15 +296,18 @@ class OwnerAPIview(APIView):
     def get(self, request):
         pk = request.GET.get('pk')
         if pk:
-            queryset = SchoolOwner.objects.get(pk=pk)
-            if not queryset:
+            try:
+                queryset = SchoolOwner.objects.get(pk=pk,isdeleted=False)
+            except:
                 return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
+            
             serialized_data = SchoolOwnerSerializer(queryset)
         else:
             queryset = SchoolOwner.objects.all()
             serialized_data = SchoolOwnerSerializer(queryset, many=True)
+
         return StandarizedSuccessResponse(
             data=serialized_data.data,
             message=f'Successfully retrieved Available School.',
@@ -319,17 +325,16 @@ class OwnerAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            school_owner = School.objects.get(pk=pk)
-        except School.DoesNotExist:
+            school_owner = School.objects.get(pk=pk,isdeleted=False)
+        except SchoolOwner.DoesNotExist:
             return StandarizedErrorResponse(
                 message='Failed to delete school.',
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        name = school_owner.name
-        school_owner.delete()
+        school_owner.isdeleted = True
         return StandarizedSuccessResponse(
-            message=f'Successfully Deleted School "{name}"',
+            message=f'Successfully Deleted School "{school_owner.name}"',
             status_code=status.HTTP_200_OK
         )
 
@@ -346,7 +351,7 @@ class OwnerAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_owner = SchoolOwner.objects.get(pk=pk)
+            current_owner = SchoolOwner.objects.get(pk=pk,isdeleted=False)
         except SchoolOwner.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Owner does'nt exist.",

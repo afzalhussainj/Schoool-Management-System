@@ -9,9 +9,6 @@ from .serializers import *
 from .models import School
 from .permissions import IsBranchManager,IsSchoolOwner
 
-
-
-
 class SchoolAPIView(APIView):
     authentication_classes = [JWTAuthentication]
 
@@ -62,11 +59,13 @@ class SchoolAPIView(APIView):
     def get(self, request):
         pk = request.GET.get('pk')
         if pk:
-            queryset = School.objects.get(pk=pk)
-            if not queryset:
+            try:
+                queryset = School.objects.get(pk=pk,isdeleted=False)
+            except:
                 return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
+            
             serialized_data = SchoolSerializer(queryset)
         else:
             queryset = School.objects.all()
@@ -88,7 +87,7 @@ class SchoolAPIView(APIView):
     )
     def delete(self, request, pk):
         try:
-            school = School.objects.get(pk=pk)
+            school = School.objects.get(pk=pk,isdeleted=False)
         except School.DoesNotExist:
             return StandarizedErrorResponse(
                 message='Failed to delete school.',
@@ -115,7 +114,7 @@ class SchoolAPIView(APIView):
     )
     def put(self, request, pk):
         try:
-            school = School.objects.get(pk=pk)
+            school = School.objects.get(pk=pk,isdeleted=False)
         except School.DoesNotExist:
             return StandarizedErrorResponse(
                 message="School doesn't exist.",
@@ -185,15 +184,18 @@ class SchoolBranchAPIview(APIView):
     def get(self, request):
         pk = request.GET.get('pk')
         if pk:
-            queryset = SchoolBranch.objects.get(pk=pk)
-            if not queryset:
+            try:
+                queryset = SchoolBranch.objects.get(pk=pk,isdeleted=False)
+            except:
                 return StandarizedErrorResponse(
                 message='Failed to retrieve School Branch.',
                 status_code=status.HTTP_404_NOT_FOUND)
+            
             serialized_data = SchoolSerializer(queryset)
         else:
             queryset = School.objects.all()
             serialized_data = SchoolBranchSerializer(queryset, many=True)
+
         return StandarizedSuccessResponse(
             data=serialized_data.data,
             message=f'Successfully retrieved Available School Branch.',
@@ -210,17 +212,18 @@ class SchoolBranchAPIview(APIView):
         }
     )
     def delete(self,pk, request):
-        queryset = SchoolBranch.objects.get(pk=pk)
-        if queryset:
-            name = queryset.name
-            queryset.delete()
-            return StandarizedSuccessResponse(
-                message=f'Successfully Deleted School Branch: "{name}"',
-                status_code=status.HTTP_200_OK)
-        else:
+        try:
+            queryset = SchoolBranch.objects.get(pk=pk,isdeleted=False)
+        except:
             return StandarizedErrorResponse(
                 message='Failed to delete school Branch.',
                 status_code=status.HTTP_404_NOT_FOUND)
+        
+        name = queryset.name
+        queryset.isdeleted = True
+        return StandarizedSuccessResponse(
+            message=f'Successfully Deleted School Branch: "{name}"',
+            status_code=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         request_body=SchoolBranchSerializer,
@@ -235,7 +238,7 @@ class SchoolBranchAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_branch = SchoolBranch.objects.get(pk=pk)
+            current_branch = SchoolBranch.objects.get(pk=pk,isdeleted=False)
         except SchoolBranch.DoesNotExist:
             return StandarizedErrorResponse(
                 message="School branch does'nt exist.",
