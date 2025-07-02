@@ -43,16 +43,15 @@ class SchoolAPIView(APIView):
         )
     
     @swagger_auto_schema(
-        request_body=SchoolSerializer,
         responses={
             200: openapi.Response('Successfully listed available School.', StandarizedSuccessResponseSerializer),
         }
     )
     def get(self, request):
         return StandarizedSuccessResponse(
-                data=self.queryset,
-                message=f'Successfully listed available School.',
-                status_code=status.HTTP_200_OK
+            data=self.queryset,
+            message=f'Successfully listed available School.',
+            status_code=status.HTTP_200_OK
             )
 
 
@@ -159,7 +158,7 @@ class SchoolpkAPIView(APIView):
 
 class SchoolBranchAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = SchoolBranch.objects.get(isdeleted=False)
+    queryset = SchoolBranch.objects.filter(isdeleted=False)
 
     def get_permissions(self):
         if self.request.method == 'POST':
