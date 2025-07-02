@@ -252,7 +252,7 @@ class PrincipalAPIview(APIView):
                 message=f'Failed to update principal "{current_principal.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
  
-class OwnerCreateAPIview(APIView):
+class OwnerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
 
     @swagger_auto_schema(
