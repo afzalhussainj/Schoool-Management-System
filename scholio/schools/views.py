@@ -63,12 +63,16 @@ class SchoolAPIView(APIView):
         pk = request.GET.get('pk')
         if pk:
             queryset = School.objects.get(pk=pk)
-            serializer = SchoolSerializer(queryset)
+            if not queryset:
+                return StandarizedErrorResponse(
+                message='Failed to retrieve School.',
+                status_code=status.HTTP_404_NOT_FOUND)
+            serialized_data = SchoolSerializer(queryset)
         else:
             queryset = School.objects.all()
-            serializer = SchoolSerializer(queryset, many=True)
+            serialized_data = SchoolSerializer(queryset, many=True)
         return StandarizedSuccessResponse(
-            data=serializer.data,
+            data=serialized_data.data,
             message=f'Successfully retrieved Available School.',
             status_code=status.HTTP_200_OK
         )
@@ -130,33 +134,26 @@ class SchoolAPIView(APIView):
             details=serializer.errors,
             message=f'Failed to update school "{school.name}".',
             status_code=status.HTTP_400_BAD_REQUEST
-        )
+        )  
 
-class SchoolRetrieveSpecificAPIview(APIView):
-    # queryset = School.objects.all()
-    # permission_classes = [permissions.IsAdminUser]
+class SchoolBranchAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    serializer_class = SchoolSerializer
 
-    def get(self,pk, request):
-        queryset = School.objects.get(pk=pk)
-        if queryset:
-            serialized_data = SchoolSerializer(data=queryset)
-            return StandarizedSuccessResponse(
-                data=serialized_data.data,
-                message=f'Successfully Retrieved School "{queryset.name}"',
-                status_code=status.HTTP_200_OK)
-        else:
-            return StandarizedErrorResponse(
-                message='Failed to retrieve school.',
-                status_code=status.HTTP_404_NOT_FOUND)   
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [permissions.IsAdminUser()|IsSchoolOwner]
+        if self.request.method == 'DELETE':
+            return [permissions.IsAdminUser()|IsSchoolOwner]
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
 
-class SchoolBranchCreateAPIview(APIView):
-    # queryset = School.objects.all()
-    permission_classes = [permissions.IsAdminUser,IsSchoolOwner]
-    authentication_classes = [JWTAuthentication]
-    serializer_class = SchoolBranchSerializer
-
+    @swagger_auto_schema(
+        request_body=SchoolBranchSerializer,
+        responses={
+            201: openapi.Response('Successfully created School.', StandarizedSuccessResponseSerializer),
+            400: openapi.Response('Failed to create School.', StandarizedErrorResponseSerializer),
+        }
+    )
     def post(self, request):
         serializer = SchoolBranchSerializer(data=request.data)
         if serializer.is_valid():
@@ -171,69 +168,47 @@ class SchoolBranchCreateAPIview(APIView):
                 message='Failed to create school branch.',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
-class SchoolBranchRetrieveAllAPIview(APIView):
-    # queryset = School.objects.all()
-    # permission_classes = [permissions.IsAdminUser]
-    authentication_classes = [JWTAuthentication]
-    serializer_class = SchoolBranchSerializer
-
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response('Successfully Retrieved School Branch.',StandarizedSuccessResponseSerializer),
+        },
+        manual_parameters=[
+            openapi.Parameter(
+                'pk',
+                openapi.IN_QUERY,
+                description="Primary Key of the School Branch",
+                type=openapi.TYPE_INTEGER,
+                # required=False
+                )
+        ],
+    )
     def get(self, request):
-        queryset = SchoolBranch.objects.all()
-        if queryset:
-            serialized_data = SchoolBranchSerializer(data=queryset,many=True)
-            return StandarizedSuccessResponse(
-            data=serialized_data.data,
-            message=f'Successfully retrieved available School Branches.',
-                status_code=status.HTTP_200_OK)
-        else:
-            return StandarizedErrorResponse(
+        pk = request.GET.get('pk')
+        if pk:
+            queryset = SchoolBranch.objects.get(pk=pk)
+            if not queryset:
+                return StandarizedErrorResponse(
                 message='Failed to retrieve School Branch.',
                 status_code=status.HTTP_404_NOT_FOUND)
-        
-class SchoolBranchRetrieveAllSpecificAPIview(APIView):
-    # queryset = School.objects.all()
-    # permission_classes = [permissions.IsAdminUser]
-    authentication_classes = [JWTAuthentication]
-    serializer_class = SchoolBranchSerializer
-
-    def get(self,pk, request):
-        queryset = SchoolBranch.objects.get(school=School.objects.get(pk=pk))
-        if queryset:
-            serialized_data = SchoolBranchSerializer(data=queryset,many=True)
-            return StandarizedSuccessResponse(
-                data=serialized_data.data,
-                message=f'Successfully retrieved available School Branches.',
-                status_code=status.HTTP_200_OK)
+            serialized_data = SchoolSerializer(queryset)
         else:
-            return StandarizedErrorResponse(
-                message='Failed to retrieve Branch.',
-                status_code=status.HTTP_404_NOT_FOUND)
-        
-class SchoolBranchRetrieveSpecificAPIview(APIView):
-    # queryset = School.objects.all()
-    # permission_classes = [permissions.IsAdminUser]
-    authentication_classes = [JWTAuthentication]
-    serializer_class = SchoolBranchSerializer
-
-    def get(self,pk, request):
-        queryset = SchoolBranch.objects.get(pk=pk)
-        if queryset:
-            serialized_data = SchoolBranchSerializer(data=queryset)
-            return StandarizedSuccessResponse(
-                data=serialized_data.data,
-                message=f'Successfully Retrieved School Branch: "{queryset.name}"',
-                status_code=status.HTTP_200_OK)
-        else:
-            return StandarizedErrorResponse(
-                message='Failed to retrieve school Branch.',
-                status_code=status.HTTP_404_NOT_FOUND)
-
-class SchoolBranchDeleteAPIview(APIView):
-    # queryset = School.objects.all()
-    permission_classes = [permissions.IsAdminUser,IsSchoolOwner]
-    authentication_classes = [JWTAuthentication]
-    serializer_class = SchoolBranchSerializer
-
+            queryset = School.objects.all()
+            serialized_data = SchoolBranchSerializer(queryset, many=True)
+        return StandarizedSuccessResponse(
+            data=serialized_data.data,
+            message=f'Successfully retrieved Available School Branch.',
+            status_code=status.HTTP_200_OK
+        )
+          
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School Branch", type=openapi.TYPE_INTEGER)
+        ],
+        responses={
+            200: openapi.Response('Successfully Deleted School Branch.', StandarizedSuccessResponseSerializer),
+            404: openapi.Response('Failed to delete school Branch.', StandarizedErrorResponseSerializer),
+        }
+    )
     def delete(self,pk, request):
         queryset = SchoolBranch.objects.get(pk=pk)
         if queryset:
@@ -247,12 +222,17 @@ class SchoolBranchDeleteAPIview(APIView):
                 message='Failed to delete school Branch.',
                 status_code=status.HTTP_404_NOT_FOUND)
 
-class SchoolBranchUpdateAPIview(APIView):
-    # queryset = School.objects.all()
-    permission_classes = [permissions.IsAdminUser,IsSchoolOwner]
-    authentication_classes = [JWTAuthentication]
-    serializer_class = SchoolBranchSerializer
-  
+    @swagger_auto_schema(
+        request_body=SchoolSerializer,
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School Branch", type=openapi.TYPE_INTEGER)
+        ],
+        responses={
+            200: openapi.Response('Successfully updated school Branch.', StandarizedSuccessResponseSerializer),
+            400: openapi.Response('Failed to update school Branch.', StandarizedErrorResponseSerializer),
+            404: openapi.Response('School Branch not found.', StandarizedErrorResponseSerializer),
+        }
+    )
     def put(self, request, pk, format=None):
         try:
             current_branch = SchoolBranch.objects.get(pk=pk)
@@ -273,121 +253,3 @@ class SchoolBranchUpdateAPIview(APIView):
                 message=f'Failed to update school branch"{current_branch.branch_name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
-#combined api view classes
-# class SchoolAPIview(APIView):
-#     # queryset = School.objects.all()
-#     permission_classes = [permissions.IsAdminUser]
-#     authentication_classes = [JWTAuthentication]
-#     serializer_class = SchoolSerializer
-
-#     @extend_schema(
-#             # methods=["POST"],
-#             request=SchoolSerializer,
-#             # parameters=OpenApiParameter(name='access_token')
-#             responses={
-#                 400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create School.'),
-#                 201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created School.'),
-#             }
-#     )
-#     def post(self, request):
-#         serializer = SchoolSerializer(data=request.data)
-#         if serializer.is_valid():
-#             created_school = serializer.save()
-#             return StandarizedSuccessResponse(
-#                 data=serializer.data,
-#                 message=f'Successfully created School "{created_school.name}"',
-#                 status_code=status.HTTP_201_CREATED)
-#         else:
-#             return StandarizedErrorResponse(
-#                 details=serializer.errors,
-#                 message='Failed to create school.',
-#                 status_code=status.HTTP_400_BAD_REQUEST)
-
-#     @extend_schema(
-#             methods=["PUT"],
-#             # auth=['JWTAuthentication'],
-#             request=SchoolSerializer,
-#             responses={
-#                 400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to update school.'),
-#                 200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successful.'),
-#                 404:OpenApiResponse(StandarizedErrorResponseSerializer,description='School not found.'),
-#             }
-#     )  
-#     def put(self, request, pk, format=None):
-#         try:
-#             current_school = School.objects.get(pk=pk)
-#         except School.DoesNotExist:
-#             return StandarizedErrorResponse(
-#                 message="School does'nt exist.",
-#                 status_code=status.HTTP_404_NOT_FOUND)
-#         serializer = SchoolSerializer(current_school, data=request.data)
-#         if serializer.is_valid():
-#             updated_school = serializer.save()
-#             return StandarizedSuccessResponse(
-#                 data=serializer.data,
-#                 message=f'Successfully updated School "{updated_school.name}"',
-#                 status_code=status.HTTP_200_OK)
-#         else:
-#             return StandarizedErrorResponse(
-#                 details=serializer.errors,
-#                 message=f'Failed to update school "{current_school.name}".',
-#                 status_code=status.HTTP_400_BAD_REQUEST)
-
-# class SchoolBranchAPIview(APIView):
-#     # queryset = School.objects.all()
-#     permission_classes = [permissions.IsAdminUser,IsSchoolOwner]
-#     authentication_classes = [JWTAuthentication]
-#     serializer_class = SchoolBranchSerializer
-
-#     @extend_schema(
-#             # methods=["POST"],
-#             request=SchoolBranchSerializer,
-#             # parameters=OpenApiParameter(name='access_token')
-#             responses={
-#                 400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to create School.'),
-#                 201:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successfully created School.'),
-#             }
-#     )
-#     def post(self, request):
-#         serializer = SchoolBranchSerializer(data=request.data)
-#         if serializer.is_valid():
-#             created_branch = serializer.save()
-#             return StandarizedSuccessResponse(
-#                 data=serializer.data,
-#                 message=f'Successfully created School branch"{created_branch.branch_name}"',
-#                 status_code=status.HTTP_201_CREATED)
-#         else:
-#             return StandarizedErrorResponse(
-#                 details=serializer.errors,
-#                 message='Failed to create school branch.',
-#                 status_code=status.HTTP_400_BAD_REQUEST)
-
-#     @extend_schema(
-#             methods=["PUT"],
-#             # auth=['JWTAuthentication'],
-#             request=SchoolBranchSerializer,
-#             responses={
-#                 400:OpenApiResponse(StandarizedErrorResponseSerializer,description='Failed to update school branch.'),
-#                 200:OpenApiResponse(StandarizedSuccessResponseSerializer,description='Successful.'),
-#                 404:OpenApiResponse(StandarizedErrorResponseSerializer,description='School branch not found.'),
-#             }
-#     )  
-#     def put(self, request, pk, format=None):
-#         try:
-#             current_branch = SchoolBranch.objects.get(pk=pk)
-#         except SchoolBranch.DoesNotExist:
-#             return StandarizedErrorResponse(
-#                 message="School branch does'nt exist.",
-#                 status_code=status.HTTP_404_NOT_FOUND)
-#         serializer = SchoolSerializer(current_branch, data=request.data)
-#         if serializer.is_valid():
-#             updated_branch = serializer.save()
-#             return StandarizedSuccessResponse(
-#                 data=serializer.data,
-#                 message=f'Successfully updated School branch"{updated_branch.branch_name}"',
-#                 status_code=status.HTTP_200_OK)
-#         else:
-#             return StandarizedErrorResponse(
-#                 details=serializer.errors,
-#                 message=f'Failed to update school branch"{current_branch.branch_name}".',
-#                 status_code=status.HTTP_400_BAD_REQUEST)
