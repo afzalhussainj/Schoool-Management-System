@@ -15,10 +15,6 @@ class SchoolAPIView(APIView):
     def get_permissions(self):
         if self.request.method == 'POST':
             return [permissions.IsAdminUser()]
-        if self.request.method == 'DELETE':
-            return [permissions.IsAdminUser()]
-        if self.request.method == 'GET':
-            return [permissions.AllowAny()]
 
     @swagger_auto_schema(
         request_body=SchoolSerializer,
@@ -42,6 +38,19 @@ class SchoolAPIView(APIView):
             status_code=status.HTTP_400_BAD_REQUEST
         )
 
+
+class SchoolpkAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    queryset = School.objects.filter(isdeleted=False)
+
+    def get_permissions(self):
+        if self.request.method == 'PUT':
+            return [permissions.IsAdminUser()]
+        if self.request.method == 'DELETE':
+            return [permissions.IsAdminUser()]
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+    
     @swagger_auto_schema(
         responses={
             200: openapi.Response('Successfully Retrieved School.',StandarizedSuccessResponseSerializer),
@@ -56,20 +65,16 @@ class SchoolAPIView(APIView):
                 )
         ],
     )
-    def get(self, request):
-        pk = request.GET.get('pk')
-        if pk:
-            try:
-                queryset = School.objects.get(pk=pk,isdeleted=False)
-            except:
-                return StandarizedErrorResponse(
+    def get(self, request, pk):
+        try:
+            queryset = School.objects.get(pk=pk)
+        except:
+            return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
-                status_code=status.HTTP_404_NOT_FOUND)
+                status_code=status.HTTP_404_NOT_FOUND
+                )
             
-            serialized_data = SchoolSerializer(queryset)
-        else:
-            queryset = School.objects.all()
-            serialized_data = SchoolSerializer(queryset, many=True)
+        serialized_data = SchoolSerializer(queryset)
         return StandarizedSuccessResponse(
             data=serialized_data.data,
             message=f'Successfully retrieved Available School.',
@@ -87,17 +92,16 @@ class SchoolAPIView(APIView):
     )
     def delete(self, request, pk):
         try:
-            school = School.objects.get(pk=pk,isdeleted=False)
+            school = School.objects.get(pk=pk)
         except School.DoesNotExist:
             return StandarizedErrorResponse(
                 message='Failed to delete school.',
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        name = school.name
         school.delete()
         return StandarizedSuccessResponse(
-            message=f'Successfully Deleted School "{name}"',
+            message=f'Successfully Deleted School "{school.name}"',
             status_code=status.HTTP_200_OK
         )
 
@@ -114,7 +118,7 @@ class SchoolAPIView(APIView):
     )
     def put(self, request, pk):
         try:
-            school = School.objects.get(pk=pk,isdeleted=False)
+            school = School.objects.get(pk=pk)
         except School.DoesNotExist:
             return StandarizedErrorResponse(
                 message="School doesn't exist.",
@@ -135,16 +139,13 @@ class SchoolAPIView(APIView):
             status_code=status.HTTP_400_BAD_REQUEST
         )  
 
+
 class SchoolBranchAPIview(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [permissions.IsAdminUser()|IsSchoolOwner]
-        if self.request.method == 'DELETE':
-            return [permissions.IsAdminUser()|IsSchoolOwner]
-        if self.request.method == 'GET':
-            return [permissions.AllowAny()]
 
     @swagger_auto_schema(
         request_body=SchoolBranchSerializer,
@@ -167,6 +168,19 @@ class SchoolBranchAPIview(APIView):
                 message='Failed to create school branch.',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
+
+class SchoolBranchpkAPIview(APIView):
+    authentication_classes = [JWTAuthentication]
+    queryset = SchoolBranch.objects.filter(isdeleted=False)
+
+    def get_permissions(self):
+        if self.request.method == 'PUT':
+            return [permissions.IsAdminUser()|IsSchoolOwner]
+        if self.request.method == 'DELETE':
+            return [permissions.IsAdminUser()|IsSchoolOwner]
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+
     @swagger_auto_schema(
         responses={
             200: openapi.Response('Successfully Retrieved School Branch.',StandarizedSuccessResponseSerializer),
@@ -181,27 +195,23 @@ class SchoolBranchAPIview(APIView):
                 )
         ],
     )
-    def get(self, request):
-        pk = request.GET.get('pk')
-        if pk:
-            try:
-                queryset = SchoolBranch.objects.get(pk=pk,isdeleted=False)
-            except:
-                return StandarizedErrorResponse(
+    def get(self, request, pk):
+        try:
+            branch = SchoolBranch.objects.get(pk=pk)
+        except:
+            return StandarizedErrorResponse(
                 message='Failed to retrieve School Branch.',
-                status_code=status.HTTP_404_NOT_FOUND)
+                status_code=status.HTTP_404_NOT_FOUND
+                )
             
-            serialized_data = SchoolSerializer(queryset)
-        else:
-            queryset = School.objects.all()
-            serialized_data = SchoolBranchSerializer(queryset, many=True)
+        serialized_data = SchoolSerializer(branch)
 
         return StandarizedSuccessResponse(
             data=serialized_data.data,
             message=f'Successfully retrieved Available School Branch.',
             status_code=status.HTTP_200_OK
         )
-          
+
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School Branch", type=openapi.TYPE_INTEGER)
@@ -211,18 +221,17 @@ class SchoolBranchAPIview(APIView):
             404: openapi.Response('Failed to delete school Branch.', StandarizedErrorResponseSerializer),
         }
     )
-    def delete(self,pk, request):
+    def delete(self, request, pk):
         try:
-            queryset = SchoolBranch.objects.get(pk=pk,isdeleted=False)
+            branch = SchoolBranch.objects.get(pk=pk)
         except:
             return StandarizedErrorResponse(
                 message='Failed to delete school Branch.',
                 status_code=status.HTTP_404_NOT_FOUND)
         
-        name = queryset.name
-        queryset.isdeleted = True
+        branch.isdeleted = True
         return StandarizedSuccessResponse(
-            message=f'Successfully Deleted School Branch: "{name}"',
+            message=f'Successfully Deleted School Branch: "{branch.branch_name}"',
             status_code=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -238,7 +247,7 @@ class SchoolBranchAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_branch = SchoolBranch.objects.get(pk=pk,isdeleted=False)
+            current_branch = SchoolBranch.objects.get(pk=pk)
         except SchoolBranch.DoesNotExist:
             return StandarizedErrorResponse(
                 message="School branch does'nt exist.",

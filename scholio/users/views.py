@@ -21,10 +21,6 @@ class BranchManagerAPIview(APIView):
     def get_permissions(self):
         if self.request.method == 'POST':
             return [OR(IsAdminUser(),IsSchoolOwner)]
-        if self.request.method == 'DELETE':
-            return [OR(IsAdminUser(),IsSchoolOwner)]
-        if self.request.method == 'GET':
-            return [AllowAny()]
     
     @swagger_auto_schema(
         request_body=BranchManagerSerializer,
@@ -47,6 +43,19 @@ class BranchManagerAPIview(APIView):
                 message='Failed to create Branch manager.',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
+
+class BranchManagerpkAPIview(APIView):
+    authentication_classes = [JWTAuthentication]
+    queryset = BranchManager.objects.filter(isdeleted=False)
+
+    def get_permissions(self):
+        if self.request.method == 'PUT':
+            return [OR(IsAdminUser(),IsSchoolOwner)]
+        if self.request.method == 'DELETE':
+            return [OR(IsAdminUser(),IsSchoolOwner)]
+        if self.request.method == 'GET':
+            return [AllowAny()]
+    
     @swagger_auto_schema(
         responses={
             200: openapi.Response('Successfully Retrieved Branch manager.',StandarizedSuccessResponseSerializer),
@@ -61,19 +70,14 @@ class BranchManagerAPIview(APIView):
                 )
         ],
     )
-    def get(self, request):
-        pk = request.GET.get('pk')
-        if pk:
-            try:
-                queryset = BranchManager.objects.get(pk=pk,isdeleted=False)
-            except:
-                return StandarizedErrorResponse(
+    def get(self, request, pk):
+        try:
+            manager = BranchManager.objects.get(pk=pk)
+        except:
+            return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
-            serialized_data = BranchManagerSerializer(queryset)
-        else:
-            queryset = School.objects.all()
-            serialized_data = BranchManagerSerializer(queryset, many=True)
+        serialized_data = BranchManagerSerializer(manager)
         return StandarizedSuccessResponse(
             data=serialized_data.data,
             message=f'Successfully retrieved Available School.',
@@ -91,16 +95,15 @@ class BranchManagerAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            queryset = BranchManager.objects.get(pk=pk,isdeleted=False)
+            manager = BranchManager.objects.get(pk=pk)
         except:
             return StandarizedErrorResponse(
                 message='Failed to delete Branch Manager.',
                 status_code=status.HTTP_404_NOT_FOUND)
-        
-        name = queryset.name
-        queryset.isdeleted = True
+
+        manager.isdeleted = True
         return StandarizedSuccessResponse(
-            message=f'Successfully Deleted Branch Manager "{name}"',
+            message=f'Successfully Deleted Branch Manager "{manager.name}"',
             status_code=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -116,7 +119,7 @@ class BranchManagerAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_bm = BranchManager.objects.get(pk=pk,isdeleted=False)
+            current_bm = BranchManager.objects.get(pk=pk)
         except BranchManager.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Branch Manager does'nt exist.",
@@ -133,17 +136,14 @@ class BranchManagerAPIview(APIView):
                 details=serializer.errors,
                 message=f'Failed to update Branch Manager "{current_bm.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
-    
+
+ 
 class PrincipalAPIview(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [OR(IsAdminUser(),IsSchoolOwner,IsBranchManager)]
-        if self.request.method == 'DELETE':
-            return [OR(IsAdminUser(),IsSchoolOwner,IsBranchManager)]
-        if self.request.method == 'GET':
-            return [AllowAny()]
 
     @swagger_auto_schema(
         request_body=PrincipalSerializer,
@@ -166,6 +166,19 @@ class PrincipalAPIview(APIView):
                 message='Failed to create Principal.',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
+
+class PrincipalpkAPIview(APIView):
+    authentication_classes = [JWTAuthentication]
+    queryset = Principal.objects.filter(isdeleted=False)
+
+    def get_permissions(self):
+        if self.request.method == 'PUT':
+            return [OR(IsAdminUser(),IsSchoolOwner,IsBranchManager)]
+        if self.request.method == 'DELETE':
+            return [OR(IsAdminUser(),IsSchoolOwner,IsBranchManager)]
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        
     @swagger_auto_schema(
         responses={
             200: openapi.Response('Successfully Retrieved School.',StandarizedSuccessResponseSerializer),
@@ -180,19 +193,14 @@ class PrincipalAPIview(APIView):
                 )
         ],
     )
-    def get(self, request):
-        pk = request.GET.get('pk')
-        if pk:
-            try:
-                queryset = Principal.objects.get(pk=pk,isdeleted=False)
-            except:
-                return StandarizedErrorResponse(
+    def get(self, request, pk):
+        try:
+            principal = Principal.objects.get(pk=pk)
+        except:
+            return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
-            serialized_data = PrincipalSerializer(queryset)
-        else:
-            queryset = Principal.objects.all()
-            serialized_data = PrincipalSerializer(queryset, many=True)
+        serialized_data = PrincipalSerializer(principal)
         return StandarizedSuccessResponse(
             data=serialized_data.data,
             message=f'Successfully retrieved Available School.',
@@ -210,17 +218,16 @@ class PrincipalAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            principal = Principal.objects.get(pk=pk,isdeleted=False)
+            principal = Principal.objects.get(pk=pk)
         except Principal.DoesNotExist:
             return StandarizedErrorResponse(
                 message='Failed to delete school.',
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        name = principal.name
         principal.isdeleted = True
         return StandarizedSuccessResponse(
-            message=f'Successfully Deleted School "{name}"',
+            message=f'Successfully Deleted School "{principal.name}"',
             status_code=status.HTTP_200_OK
         )
 
@@ -237,7 +244,7 @@ class PrincipalAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_principal = Principal.objects.get(pk=pk,isdeleted=False)
+            current_principal = Principal.objects.get(pk=pk)
         except Principal.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Principal does'nt exist.",
@@ -255,9 +262,14 @@ class PrincipalAPIview(APIView):
                 message=f'Failed to update principal "{current_principal.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
  
+
 class OwnerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
 
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAdminUser()]
+        
     @swagger_auto_schema(
         request_body=SchoolOwnerSerializer,
         responses={
@@ -279,6 +291,18 @@ class OwnerAPIview(APIView):
                 message='Failed to create Owner.',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
+class OwnerpkAPIview(APIView):
+    authentication_classes = [JWTAuthentication]
+    quaryset = SchoolOwner.objects.filter(isdeleted=False)
+
+    def get_permissions(self):
+        if self.request.method == 'PUT':
+            return [IsAdminUser()]
+        if self.request.method == 'DELETE':
+            return [IsAdminUser()]
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        
     @swagger_auto_schema(
         responses={
             200: openapi.Response('Successfully Retrieved School.',StandarizedSuccessResponseSerializer),
@@ -293,20 +317,15 @@ class OwnerAPIview(APIView):
                 )
         ],
     )
-    def get(self, request):
-        pk = request.GET.get('pk')
-        if pk:
-            try:
-                queryset = SchoolOwner.objects.get(pk=pk,isdeleted=False)
-            except:
-                return StandarizedErrorResponse(
+    def get(self, request, pk):
+        try:
+            owner = SchoolOwner.objects.get(pk=pk)
+        except:
+            return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
             
-            serialized_data = SchoolOwnerSerializer(queryset)
-        else:
-            queryset = SchoolOwner.objects.all()
-            serialized_data = SchoolOwnerSerializer(queryset, many=True)
+        serialized_data = SchoolOwnerSerializer(owner)
 
         return StandarizedSuccessResponse(
             data=serialized_data.data,
@@ -325,7 +344,7 @@ class OwnerAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            school_owner = School.objects.get(pk=pk,isdeleted=False)
+            school_owner = School.objects.get(pk=pk)
         except SchoolOwner.DoesNotExist:
             return StandarizedErrorResponse(
                 message='Failed to delete school.',
@@ -351,7 +370,7 @@ class OwnerAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_owner = SchoolOwner.objects.get(pk=pk,isdeleted=False)
+            current_owner = SchoolOwner.objects.get(pk=pk)
         except SchoolOwner.DoesNotExist:
             return StandarizedErrorResponse(
                 message="Owner does'nt exist.",
