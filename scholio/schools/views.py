@@ -17,6 +17,8 @@ class SchoolAPIView(APIView):
     def get_permissions(self):
         if self.request.method == 'POST':
             return [permissions.IsAdminUser()]
+        if self.request.method == 'POST':
+            return [permissions.AllowAny()]
 
     @swagger_auto_schema(
         request_body=SchoolSerializer,
@@ -39,6 +41,19 @@ class SchoolAPIView(APIView):
             message='Failed to create school.',
             status_code=status.HTTP_400_BAD_REQUEST
         )
+    
+    @swagger_auto_schema(
+        request_body=SchoolSerializer,
+        responses={
+            200: openapi.Response('Successfully listed available School.', StandarizedSuccessResponseSerializer),
+        }
+    )
+    def get(self, request):
+        return StandarizedSuccessResponse(
+                data=self.queryset,
+                message=f'Successfully listed available School.',
+                status_code=status.HTTP_200_OK
+            )
 
 
 class SchoolpkAPIView(APIView):
