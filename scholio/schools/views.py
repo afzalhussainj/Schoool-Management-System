@@ -223,7 +223,7 @@ class SchoolBranchAPIview(APIView):
                 status_code=status.HTTP_404_NOT_FOUND)
 
     @swagger_auto_schema(
-        request_body=SchoolSerializer,
+        request_body=SchoolBranchSerializer,
         manual_parameters=[
             openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School Branch", type=openapi.TYPE_INTEGER)
         ],
