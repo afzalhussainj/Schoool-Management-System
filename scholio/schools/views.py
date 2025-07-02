@@ -13,11 +13,13 @@ class SchoolAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = School.objects.filter(isdeleted=False)
 
+    def get_queryset(self):
+        return self.queryset.all()
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [permissions.IsAdminUser()]
-        if self.request.method == 'POST':
+        if self.request.method == 'GET':
             return [permissions.AllowAny()]
 
     @swagger_auto_schema(
@@ -48,8 +50,9 @@ class SchoolAPIView(APIView):
         }
     )
     def get(self, request):
+        serializer = SchoolSerializer(self.get_queryset(),many=True)
         return StandarizedSuccessResponse(
-            data=self.queryset,
+            data=serializer.data,
             message=f'Successfully listed available School.',
             status_code=status.HTTP_200_OK
             )
@@ -90,9 +93,9 @@ class SchoolpkAPIView(APIView):
                 status_code=status.HTTP_404_NOT_FOUND
                 )
             
-        serialized_data = SchoolSerializer(school)
+        serializer = SchoolSerializer(school)
         return StandarizedSuccessResponse(
-            data=serialized_data.data,
+            data=serializer.data,
             message=f'Successfully retrieved Available School.',
             status_code=status.HTTP_200_OK
         )
@@ -221,10 +224,10 @@ class SchoolBranchpkAPIview(APIView):
                 status_code=status.HTTP_404_NOT_FOUND
                 )
             
-        serialized_data = SchoolSerializer(branch)
+        serializer = SchoolSerializer(branch)
 
         return StandarizedSuccessResponse(
-            data=serialized_data.data,
+            data=serializer.data,
             message=f'Successfully retrieved Available School Branch.',
             status_code=status.HTTP_200_OK
         )

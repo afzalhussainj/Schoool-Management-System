@@ -78,9 +78,9 @@ class BranchManagerpkAPIview(APIView):
             return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
-        serialized_data = BranchManagerSerializer(manager)
+        serializer = BranchManagerSerializer(manager)
         return StandarizedSuccessResponse(
-            data=serialized_data.data,
+            data=serializer.data,
             message=f'Successfully retrieved Available School.',
             status_code=status.HTTP_200_OK
         )
@@ -202,9 +202,9 @@ class PrincipalpkAPIview(APIView):
             return StandarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
-        serialized_data = PrincipalSerializer(principal)
+        serializer = PrincipalSerializer(principal)
         return StandarizedSuccessResponse(
-            data=serialized_data.data,
+            data=serializer.data,
             message=f'Successfully retrieved Available School.',
             status_code=status.HTTP_200_OK
         )
@@ -298,6 +298,9 @@ class OwnerpkAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = SchoolOwner.objects.filter(isdeleted=False)
 
+    def get_queryset(self):
+        return self.queryset.all()
+
     def get_permissions(self):
         if self.request.method == 'PUT':
             return [IsAdminUser()]
@@ -328,10 +331,10 @@ class OwnerpkAPIview(APIView):
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
             
-        serialized_data = SchoolOwnerSerializer(owner)
+        serializer = SchoolOwnerSerializer(owner)
 
         return StandarizedSuccessResponse(
-            data=serialized_data.data,
+            data=serializer.data,
             message=f'Successfully retrieved Available School.',
             status_code=status.HTTP_200_OK
         )
