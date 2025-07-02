@@ -9,12 +9,19 @@ from .serializers import *
 from .models import School
 from .permissions import IsBranchManager,IsSchoolOwner
 
+
+
+
 class SchoolAPIView(APIView):
     authentication_classes = [JWTAuthentication]
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [permissions.IsAdminUser()]
+        if self.request.method == 'DELETE':
+            return [permissions.IsAdminUser()]
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
 
     @swagger_auto_schema(
         request_body=SchoolSerializer,
@@ -40,32 +47,29 @@ class SchoolAPIView(APIView):
 
     @swagger_auto_schema(
         responses={
-            200: openapi.Response('Successfully Retrieved School.', StandarizedSuccessResponseSerializer),
+            200: openapi.Response('Successfully Retrieved School.',StandarizedSuccessResponseSerializer),
         },
         manual_parameters=[
-            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School", type=openapi.TYPE_INTEGER)
+            openapi.Parameter(
+                'pk',
+                openapi.IN_QUERY,
+                description="Primary Key of the School",
+                type=openapi.TYPE_INTEGER,
+                # required=False
+                )
         ],
     )
-    def get(self, request, pk):
-        queryset = School.objects.get(pk=pk)
-        serializer = SchoolSerializer(queryset)
+    def get(self, request):
+        pk = request.GET.get('pk')
+        if pk:
+            queryset = School.objects.get(pk=pk)
+            serializer = SchoolSerializer(queryset)
+        else:
+            queryset = School.objects.all()
+            serializer = SchoolSerializer(queryset, many=True)
         return StandarizedSuccessResponse(
             data=serializer.data,
-            message='Successfully retrieved School.',
-            status_code=status.HTTP_200_OK
-        )
-
-    @swagger_auto_schema(
-        responses={
-            200: openapi.Response('Successfully Retrieved available Schools.', StandarizedSuccessResponseSerializer),
-        },
-    )
-    def list(self, request):
-        queryset = School.objects.all()
-        serializer = SchoolSerializer(queryset, many=True)
-        return StandarizedSuccessResponse(
-            data=serializer.data,
-            message='Successfully retrieved available Schools.',
+            message=f'Successfully retrieved Available School.',
             status_code=status.HTTP_200_OK
         )
 
