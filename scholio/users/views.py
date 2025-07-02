@@ -132,12 +132,24 @@ class BranchManagerAPIview(APIView):
                 message=f'Failed to update Branch Manager "{current_bm.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
     
-class PrincipalCreateAPIview(APIView):
-    # queryset = Principal.objects.all()
-    # serializer_class = PrincipalSerializer
-    permission_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
-    serializer_class = PrincipalSerializer
+class PrincipalAPIview(APIView):
+    authentication_classes = [JWTAuthentication]
 
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [OR(IsAdminUser(),IsSchoolOwner,IsBranchManager)]
+        if self.request.method == 'DELETE':
+            return [OR(IsAdminUser(),IsSchoolOwner,IsBranchManager)]
+        if self.request.method == 'GET':
+            return [AllowAny()]
+
+    @swagger_auto_schema(
+        request_body=PrincipalSerializer,
+        responses={
+            201: openapi.Response('Successfully created School.', StandarizedSuccessResponseSerializer),
+            400: openapi.Response('Failed to create School.', StandarizedErrorResponseSerializer),
+        }
+    )
     def post(self, request):
         serializer = PrincipalSerializer(data=request.data)
         if serializer.is_valid():
@@ -152,13 +164,74 @@ class PrincipalCreateAPIview(APIView):
                 message='Failed to create Principal.',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response('Successfully Retrieved School.',StandarizedSuccessResponseSerializer),
+        },
+        manual_parameters=[
+            openapi.Parameter(
+                'pk',
+                openapi.IN_QUERY,
+                description="Primary Key of the School",
+                type=openapi.TYPE_INTEGER,
+                # required=False
+                )
+        ],
+    )
+    def get(self, request):
+        pk = request.GET.get('pk')
+        if pk:
+            queryset = Principal.objects.get(pk=pk)
+            if not queryset:
+                return StandarizedErrorResponse(
+                message='Failed to retrieve School.',
+                status_code=status.HTTP_404_NOT_FOUND)
+            serialized_data = PrincipalSerializer(queryset)
+        else:
+            queryset = Principal.objects.all()
+            serialized_data = PrincipalSerializer(queryset, many=True)
+        return StandarizedSuccessResponse(
+            data=serialized_data.data,
+            message=f'Successfully retrieved Available School.',
+            status_code=status.HTTP_200_OK
+        )
 
-class PrincipalUpdateAPIview(APIView):
-    # queryset = Principal.objects.all()
-    # serializer_class = PrincipalSerializer
-    permission_classes = [permissions.IsAdminUser, IsBranchManager, IsSchoolOwner]
-    serializer_class = PrincipalSerializer
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School", type=openapi.TYPE_INTEGER)
+        ],
+        responses={
+            200: openapi.Response('Successfully Deleted School.', StandarizedSuccessResponseSerializer),
+            404: openapi.Response('Failed to delete school.', StandarizedErrorResponseSerializer),
+        }
+    )
+    def delete(self, request, pk):
+        try:
+            principal = Principal.objects.get(pk=pk)
+        except Principal.DoesNotExist:
+            return StandarizedErrorResponse(
+                message='Failed to delete school.',
+                status_code=status.HTTP_404_NOT_FOUND
+            )
 
+        name = principal.name
+        principal.delete()
+        return StandarizedSuccessResponse(
+            message=f'Successfully Deleted School "{name}"',
+            status_code=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        request_body=PrincipalSerializer,
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School", type=openapi.TYPE_INTEGER)
+        ],
+        responses={
+            200: openapi.Response('Successfully updated school.', StandarizedSuccessResponseSerializer),
+            400: openapi.Response('Failed to update school.', StandarizedErrorResponseSerializer),
+            404: openapi.Response('School not found.', StandarizedErrorResponseSerializer),
+        }
+    )
     def put(self, request, pk, format=None):
         try:
             current_principal = Principal.objects.get(pk=pk)
@@ -180,11 +253,15 @@ class PrincipalUpdateAPIview(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST)
  
 class OwnerCreateAPIview(APIView):
-    # queryset = Principal.objects.all()
-    # serializer_class = PrincipalSerializer
-    permission_classes = [permissions.IsAdminUser]
-    serializer_class = SchoolOwnerSerializer
+    authentication_classes = [JWTAuthentication]
 
+    @swagger_auto_schema(
+        request_body=SchoolOwnerSerializer,
+        responses={
+            201: openapi.Response('Successfully created School.', StandarizedSuccessResponseSerializer),
+            400: openapi.Response('Failed to create School.', StandarizedErrorResponseSerializer),
+        }
+    )
     def post(self, request):
         serializer = SchoolOwnerSerializer(data=request.data)
         if serializer.is_valid():
@@ -199,12 +276,74 @@ class OwnerCreateAPIview(APIView):
                 message='Failed to create Owner.',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
-class OwnerUpdateAPIview(APIView):
-    # queryset = Principal.objects.all()
-    # serializer_class = PrincipalSerializer
-    permission_classes = [permissions.IsAdminUser]
-    serializer_class = SchoolOwnerSerializer
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response('Successfully Retrieved School.',StandarizedSuccessResponseSerializer),
+        },
+        manual_parameters=[
+            openapi.Parameter(
+                'pk',
+                openapi.IN_QUERY,
+                description="Primary Key of the School",
+                type=openapi.TYPE_INTEGER,
+                # required=False
+                )
+        ],
+    )
+    def get(self, request):
+        pk = request.GET.get('pk')
+        if pk:
+            queryset = SchoolOwner.objects.get(pk=pk)
+            if not queryset:
+                return StandarizedErrorResponse(
+                message='Failed to retrieve School.',
+                status_code=status.HTTP_404_NOT_FOUND)
+            serialized_data = SchoolOwnerSerializer(queryset)
+        else:
+            queryset = SchoolOwner.objects.all()
+            serialized_data = SchoolOwnerSerializer(queryset, many=True)
+        return StandarizedSuccessResponse(
+            data=serialized_data.data,
+            message=f'Successfully retrieved Available School.',
+            status_code=status.HTTP_200_OK
+        )
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School", type=openapi.TYPE_INTEGER)
+        ],
+        responses={
+            200: openapi.Response('Successfully Deleted School.', StandarizedSuccessResponseSerializer),
+            404: openapi.Response('Failed to delete school.', StandarizedErrorResponseSerializer),
+        }
+    )
+    def delete(self, request, pk):
+        try:
+            school_owner = School.objects.get(pk=pk)
+        except School.DoesNotExist:
+            return StandarizedErrorResponse(
+                message='Failed to delete school.',
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+
+        name = school_owner.name
+        school_owner.delete()
+        return StandarizedSuccessResponse(
+            message=f'Successfully Deleted School "{name}"',
+            status_code=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        request_body=SchoolOwnerSerializer,
+        manual_parameters=[
+            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School", type=openapi.TYPE_INTEGER)
+        ],
+        responses={
+            200: openapi.Response('Successfully updated school.', StandarizedSuccessResponseSerializer),
+            400: openapi.Response('Failed to update school.', StandarizedErrorResponseSerializer),
+            404: openapi.Response('School not found.', StandarizedErrorResponseSerializer),
+        }
+    )
     def put(self, request, pk, format=None):
         try:
             current_owner = SchoolOwner.objects.get(pk=pk)
