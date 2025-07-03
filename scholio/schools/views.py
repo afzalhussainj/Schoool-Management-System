@@ -3,8 +3,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from utils.StandardResponse import StandarizedErrorResponse,StandarizedSuccessResponse
-from utils.StandardResponse_serializers import StandarizedErrorResponseSerializer,StandarizedSuccessResponseSerializer
+from utils.StandardResponse import (
+    StandarizedErrorResponse,
+    StandarizedSuccessResponse
+    )
+from utils.StandardResponse_serializers import (
+    StandarizedErrorResponseSerializer,
+    StandarizedSuccessResponseSerializer
+    )
 from .serializers import *
 from .models import School
 from .permissions import IsBranchManager,IsSchoolOwner
@@ -25,8 +31,14 @@ class SchoolAPIView(APIView):
     @swagger_auto_schema(
         request_body=SchoolSerializer,
         responses={
-            201: openapi.Response('Successfully created School.', StandarizedSuccessResponseSerializer),
-            400: openapi.Response('Failed to create School.', StandarizedErrorResponseSerializer),
+            201: openapi.Response(
+                'Successfully created School.',
+                StandarizedSuccessResponseSerializer
+                ),
+            400: openapi.Response(
+                'Failed to create School.',
+                StandarizedErrorResponseSerializer
+                ),
         }
     )
     def post(self, request):
@@ -46,7 +58,10 @@ class SchoolAPIView(APIView):
     
     @swagger_auto_schema(
         responses={
-            200: openapi.Response('Successfully listed available School.', StandarizedSuccessResponseSerializer),
+            200: openapi.Response(
+                'Successfully listed available School.',
+                StandarizedSuccessResponseSerializer
+                ),
         }
     )
     def get(self, request):
@@ -72,7 +87,10 @@ class SchoolpkAPIView(APIView):
     
     @swagger_auto_schema(
         responses={
-            200: openapi.Response('Successfully Retrieved School.',StandarizedSuccessResponseSerializer),
+            200: openapi.Response(
+                'Successfully Retrieved School.',
+                StandarizedSuccessResponseSerializer
+                ),
         },
         manual_parameters=[
             openapi.Parameter(
@@ -102,11 +120,21 @@ class SchoolpkAPIView(APIView):
 
     @swagger_auto_schema(
         manual_parameters=[
-            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School", type=openapi.TYPE_INTEGER)
+            openapi.Parameter(
+                'pk',
+                openapi.IN_PATH,
+                description="Primary Key of the School",
+                type=openapi.TYPE_INTEGER)
         ],
         responses={
-            200: openapi.Response('Successfully Deleted School.', StandarizedSuccessResponseSerializer),
-            404: openapi.Response('Failed to delete school.', StandarizedErrorResponseSerializer),
+            200: openapi.Response(
+                'Successfully Deleted School.',
+                StandarizedSuccessResponseSerializer
+                ),
+            404: openapi.Response(
+                'Failed to delete school.',
+                StandarizedErrorResponseSerializer
+                ),
         }
     )
     def delete(self, request, pk):
@@ -127,12 +155,25 @@ class SchoolpkAPIView(APIView):
     @swagger_auto_schema(
         request_body=SchoolSerializer,
         manual_parameters=[
-            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School", type=openapi.TYPE_INTEGER)
+            openapi.Parameter(
+                'pk',
+                openapi.IN_PATH,
+                description="Primary Key of the School",
+                type=openapi.TYPE_INTEGER)
         ],
         responses={
-            200: openapi.Response('Successfully updated school.', StandarizedSuccessResponseSerializer),
-            400: openapi.Response('Failed to update school.', StandarizedErrorResponseSerializer),
-            404: openapi.Response('School not found.', StandarizedErrorResponseSerializer),
+            200: openapi.Response(
+                'Successfully updated school.',
+                StandarizedSuccessResponseSerializer
+                ),
+            400: openapi.Response(
+                'Failed to update school.',
+                StandarizedErrorResponseSerializer
+                ),
+            404: openapi.Response(
+                'School not found.',
+                StandarizedErrorResponseSerializer
+                ),
         }
     )
     def put(self, request, pk):
@@ -170,8 +211,14 @@ class SchoolBranchAPIview(APIView):
     @swagger_auto_schema(
         request_body=SchoolBranchSerializer,
         responses={
-            201: openapi.Response('Successfully created School.', StandarizedSuccessResponseSerializer),
-            400: openapi.Response('Failed to create School.', StandarizedErrorResponseSerializer),
+            201: openapi.Response(
+                'Successfully created School.',
+                StandarizedSuccessResponseSerializer
+                ),
+            400: openapi.Response(
+                'Failed to create School.',
+                StandarizedErrorResponseSerializer
+                ),
         }
     )
     def post(self, request):
@@ -203,7 +250,10 @@ class SchoolBranchpkAPIview(APIView):
 
     @swagger_auto_schema(
         responses={
-            200: openapi.Response('Successfully Retrieved School Branch.',StandarizedSuccessResponseSerializer),
+            200: openapi.Response(
+                'Successfully Retrieved School Branch.',
+                StandarizedSuccessResponseSerializer
+                ),
         },
         manual_parameters=[
             openapi.Parameter(
@@ -257,12 +307,26 @@ class SchoolBranchpkAPIview(APIView):
     @swagger_auto_schema(
         request_body=SchoolBranchSerializer,
         manual_parameters=[
-            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School Branch", type=openapi.TYPE_INTEGER)
+            openapi.Parameter(
+                'pk',
+                openapi.IN_PATH,
+                description="Primary Key of the School Branch",
+                type=openapi.TYPE_INTEGER
+                )
         ],
         responses={
-            200: openapi.Response('Successfully updated school Branch.', StandarizedSuccessResponseSerializer),
-            400: openapi.Response('Failed to update school Branch.', StandarizedErrorResponseSerializer),
-            404: openapi.Response('School Branch not found.', StandarizedErrorResponseSerializer),
+            200: openapi.Response(
+                'Successfully updated school Branch.',
+                StandarizedSuccessResponseSerializer
+                ),
+            400: openapi.Response(
+                'Failed to update school Branch.',
+                StandarizedErrorResponseSerializer
+                ),
+            404: openapi.Response(
+                'School Branch not found.',
+                StandarizedErrorResponseSerializer
+                ),
         }
     )
     def put(self, request, pk, format=None):
