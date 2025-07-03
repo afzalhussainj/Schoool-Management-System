@@ -6,10 +6,10 @@ from rest_framework.decorators import api_view
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from utils.StandardResponse import StandarizedErrorResponse, StandarizedSuccessResponse
+from utils.StandardResponse import standarizedErrorResponse, standarizedSuccessResponse
 from utils.StandardResponse_serializers import (
-    StandarizedErrorResponseSerializer,
-    StandarizedSuccessResponseSerializer
+    standarizedErrorResponseSerializer,
+    standarizedSuccessResponseSerializer
     )
 from schools.models import School
 from .models import Principal
@@ -31,11 +31,11 @@ class BranchManagerAPIview(APIView):
         responses={
             201: openapi.Response(
                 'Successfully created School.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
                 'Failed to create School.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
         }
     )
@@ -43,12 +43,12 @@ class BranchManagerAPIview(APIView):
         serializer = BranchManagerSerializer(data=request.data)
         if serializer.is_valid():
             created_bm = serializer.save()
-            return StandarizedSuccessResponse(
+            return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully created Branch Manager "{created_bm.name}".',
                 status_code=status.HTTP_201_CREATED)
         else:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 details=serializer.errors,
                 message='Failed to create Branch manager.',
                 status_code=status.HTTP_400_BAD_REQUEST)
@@ -70,7 +70,7 @@ class BranchManagerpkAPIview(APIView):
         responses={
             200: openapi.Response(
                 'Successfully Retrieved Branch manager.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
         },
         manual_parameters=[
@@ -87,11 +87,11 @@ class BranchManagerpkAPIview(APIView):
         try:
             manager = self.queryset.objects.get(pk=pk)
         except:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
         serializer = BranchManagerSerializer(manager)
-        return StandarizedSuccessResponse(
+        return standarizedSuccessResponse(
             data=serializer.data,
             message=f'Successfully retrieved Available School.',
             status_code=status.HTTP_200_OK
@@ -109,11 +109,11 @@ class BranchManagerpkAPIview(APIView):
         responses={
             200: openapi.Response(
                 'Successfully Deleted School.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
             404: openapi.Response(
                 'Failed to delete school.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
         }
     )
@@ -121,12 +121,12 @@ class BranchManagerpkAPIview(APIView):
         try:
             manager = self.queryset.objects.get(pk=pk)
         except:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 message='Failed to delete Branch Manager.',
                 status_code=status.HTTP_404_NOT_FOUND)
 
         manager.isdeleted = True
-        return StandarizedSuccessResponse(
+        return standarizedSuccessResponse(
             message=f'Successfully Deleted Branch Manager "{manager.name}"',
             status_code=status.HTTP_200_OK)
 
@@ -143,15 +143,15 @@ class BranchManagerpkAPIview(APIView):
         responses={
             200: openapi.Response(
                 'Successfully updated school.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
                 'Failed to update school.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
             404: openapi.Response(
                 'School not found.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
         }
     )
@@ -159,18 +159,18 @@ class BranchManagerpkAPIview(APIView):
         try:
             current_bm = self.queryset.objects.get(pk=pk)
         except BranchManager.DoesNotExist:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 message="Branch Manager does'nt exist.",
                 status_code=status.HTTP_404_NOT_FOUND)
         serializer = BranchManagerSerializer(current_bm, data=request.data)
         if serializer.is_valid():
             updated_bm = serializer.save()
-            return StandarizedSuccessResponse(
+            return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully updated Branch Manager "{updated_bm.name}"',
                 status_code=status.HTTP_200_OK)
         else:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 details=serializer.errors,
                 message=f'Failed to update Branch Manager "{current_bm.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
@@ -189,11 +189,11 @@ class PrincipalAPIview(APIView):
         responses={
             201: openapi.Response(
                 'Successfully created School.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
                 'Failed to create School.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
         }
     )
@@ -201,12 +201,12 @@ class PrincipalAPIview(APIView):
         serializer = PrincipalSerializer(data=request.data)
         if serializer.is_valid():
             created_principal = serializer.save()
-            return StandarizedSuccessResponse(
+            return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully created Principal "{created_principal.name}"',
                 status_code=status.HTTP_201_CREATED)
         else:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 details=serializer.errors,
                 message='Failed to create Principal.',
                 status_code=status.HTTP_400_BAD_REQUEST)
@@ -228,7 +228,7 @@ class PrincipalpkAPIview(APIView):
         responses={
             200: openapi.Response(
                 'Successfully Retrieved School.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
         },
         manual_parameters=[
@@ -245,11 +245,11 @@ class PrincipalpkAPIview(APIView):
         try:
             principal = self.queryset.objects.get(pk=pk)
         except:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
         serializer = PrincipalSerializer(principal)
-        return StandarizedSuccessResponse(
+        return standarizedSuccessResponse(
             data=serializer.data,
             message=f'Successfully retrieved Available School.',
             status_code=status.HTTP_200_OK
@@ -267,11 +267,11 @@ class PrincipalpkAPIview(APIView):
         responses={
             200: openapi.Response(
                 'Successfully Deleted School.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
             404: openapi.Response(
                 'Failed to delete school.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
         }
     )
@@ -279,13 +279,13 @@ class PrincipalpkAPIview(APIView):
         try:
             principal = self.queryset.objects.get(pk=pk)
         except Principal.DoesNotExist:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 message='Failed to delete school.',
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
         principal.isdeleted = True
-        return StandarizedSuccessResponse(
+        return standarizedSuccessResponse(
             message=f'Successfully Deleted School "{principal.name}"',
             status_code=status.HTTP_200_OK
         )
@@ -303,15 +303,15 @@ class PrincipalpkAPIview(APIView):
         responses={
             200: openapi.Response(
                 'Successfully updated school.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
                 'Failed to update school.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
             404: openapi.Response(
                 'School not found.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
         }
     )
@@ -319,18 +319,18 @@ class PrincipalpkAPIview(APIView):
         try:
             current_principal = self.queryset.objects.get(pk=pk)
         except Principal.DoesNotExist:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 message="Principal does'nt exist.",
                 status_code=status.HTTP_404_NOT_FOUND)
         serializer = PrincipalSerializer(current_principal, data=request.data)
         if serializer.is_valid():
             updated_principal = serializer.save()
-            return StandarizedSuccessResponse(
+            return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully updated Principal "{updated_principal.name}"',
                 status_code=status.HTTP_200_OK)
         else:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 details=serializer.errors,
                 message=f'Failed to update principal "{current_principal.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
@@ -349,11 +349,11 @@ class OwnerAPIview(APIView):
         responses={
             201: openapi.Response(
                 'Successfully created School.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
                 'Failed to create School.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
         }
     )
@@ -361,12 +361,12 @@ class OwnerAPIview(APIView):
         serializer = SchoolOwnerSerializer(data=request.data)
         if serializer.is_valid():
             created_owner = serializer.save()
-            return StandarizedSuccessResponse(
+            return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully created Owner "{created_owner.name}"',
                 status_code=status.HTTP_201_CREATED)
         else:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 details=serializer.errors,
                 message='Failed to create Owner.',
                 status_code=status.HTTP_400_BAD_REQUEST)
@@ -390,7 +390,7 @@ class OwnerpkAPIview(APIView):
         responses={
             200: openapi.Response(
                 'Successfully Retrieved School.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
         },
         manual_parameters=[
@@ -407,13 +407,13 @@ class OwnerpkAPIview(APIView):
         try:
             owner = self.queryset.objects.get(pk=pk)
         except:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
             
         serializer = SchoolOwnerSerializer(owner)
 
-        return StandarizedSuccessResponse(
+        return standarizedSuccessResponse(
             data=serializer.data,
             message=f'Successfully retrieved Available School.',
             status_code=status.HTTP_200_OK
@@ -431,11 +431,11 @@ class OwnerpkAPIview(APIView):
         responses={
             200: openapi.Response(
                 'Successfully Deleted School.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
             404: openapi.Response(
                 'Failed to delete school.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
         }
     )
@@ -443,13 +443,13 @@ class OwnerpkAPIview(APIView):
         try:
             school_owner = self.queryset.objects.get(pk=pk)
         except SchoolOwner.DoesNotExist:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 message='Failed to delete school.',
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
         school_owner.isdeleted = True
-        return StandarizedSuccessResponse(
+        return standarizedSuccessResponse(
             message=f'Successfully Deleted School "{school_owner.name}"',
             status_code=status.HTTP_200_OK
         )
@@ -467,15 +467,15 @@ class OwnerpkAPIview(APIView):
         responses={
             200: openapi.Response(
                 'Successfully updated school.',
-                StandarizedSuccessResponseSerializer
+                standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
                 'Failed to update school.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
             404: openapi.Response(
                 'School not found.',
-                StandarizedErrorResponseSerializer
+                standarizedErrorResponseSerializer
                 ),
         }
     )
@@ -483,18 +483,18 @@ class OwnerpkAPIview(APIView):
         try:
             current_owner = self.queryset.objects.get(pk=pk)
         except SchoolOwner.DoesNotExist:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 message="Owner does'nt exist.",
                 status_code=status.HTTP_404_NOT_FOUND)
         serializer = SchoolOwnerSerializer(current_owner, data=request.data)
         if serializer.is_valid():
             updated_owner = serializer.save()
-            return StandarizedSuccessResponse(
+            return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully updated Owner "{updated_owner.name}"',
                 status_code=status.HTTP_200_OK)
         else:
-            return StandarizedErrorResponse(
+            return standarizedErrorResponse(
                 details=serializer.errors,
                 message=f'Failed to update Owner "{current_owner.name}".',
                 status_code=status.HTTP_400_BAD_REQUEST)

@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 
-def StandarizedSuccessResponse(
+def standarizedSuccessResponse(
         message,
         status_code ,
         data=(),
@@ -12,7 +12,7 @@ def StandarizedSuccessResponse(
         'message':message,
     },status=status_code)
 
-def StandarizedErrorResponse(
+def standarizedErrorResponse(
         message,
         status_code ,
         details={},

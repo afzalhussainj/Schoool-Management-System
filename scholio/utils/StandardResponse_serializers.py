@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-class StandarizedSuccessResponseSerializer(serializers.Serializer):
+class standarizedSuccessResponseSerializer(serializers.Serializer):
     status = serializers.CharField(default='Success')
     message = serializers.CharField()
     data = serializers.DictField()
 
-class StandarizedErrorResponseSerializer(serializers.Serializer):
+class standarizedErrorResponseSerializer(serializers.Serializer):
     status = serializers.CharField(default='Failure')
     message = serializers.CharField()
     details = serializers.DictField()
