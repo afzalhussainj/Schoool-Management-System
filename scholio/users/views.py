@@ -12,7 +12,6 @@ from utils.StandardResponse_serializers import (
     standarizedSuccessResponseSerializer
     )
 from schools.models import School
-from .models import Principal
 from .serializers import *
 from .permissions import IsBranchManager, IsSchoolOwner
 
@@ -20,32 +19,32 @@ from .permissions import IsBranchManager, IsSchoolOwner
 
 class BranchManagerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = BranchManager.objects.filter(isdeleted=False)
+    queryset = CustomUserModel.objects.filter(is_active=False)
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [OR(IsAdminUser(),IsSchoolOwner)]
     
     @swagger_auto_schema(
-        request_body=BranchManagerSerializer,
+        request_body=CustomUserCreateSerializer,
         responses={
             201: openapi.Response(
-                'Successfully created School.',
+                'Successfully created Branch Manager.',
                 standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
-                'Failed to create School.',
+                'Failed to create Branch Manager.',
                 standarizedErrorResponseSerializer
                 ),
         }
     )
     def post(self, request):
-        serializer = BranchManagerSerializer(data=request.data)
+        serializer = CustomUserCreateSerializer(data=request.data)
         if serializer.is_valid():
-            created_bm = serializer.save()
+            created_user = serializer.save(role = 'manager')
             return standarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully created Branch Manager "{created_bm.name}".',
+                message=f'Successfully created Branch Manager "{created_user.email}".',
                 status_code=status.HTTP_201_CREATED)
         else:
             return standarizedErrorResponse(
@@ -56,7 +55,7 @@ class BranchManagerAPIview(APIView):
 
 class BranchManagerpkAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = BranchManager.objects.filter(isdeleted=False)
+    queryset = CustomUserModel.objects.filter(is_active=False)
 
     def get_permissions(self):
         if self.request.method == 'PUT':
@@ -72,11 +71,15 @@ class BranchManagerpkAPIview(APIView):
                 'Successfully Retrieved Branch manager.',
                 standarizedSuccessResponseSerializer
                 ),
+            404: openapi.Response(
+                'Failed to Retrieved Branch manager.',
+                standarizedSuccessResponseSerializer
+                ),
         },
         manual_parameters=[
             openapi.Parameter(
                 'pk',
-                openapi.IN_QUERY,
+                openapi.IN_PATH,
                 description="Primary Key of the Branch manager",
                 type=openapi.TYPE_INTEGER,
                 # required=False
@@ -85,15 +88,15 @@ class BranchManagerpkAPIview(APIView):
     )
     def get(self, request, pk):
         try:
-            manager = self.queryset.objects.get(pk=pk)
+            manager = self.queryset.get(pk=pk)
         except:
             return standarizedErrorResponse(
-                message='Failed to retrieve School.',
+                message='Failed to retrieve Branch Manager.',
                 status_code=status.HTTP_404_NOT_FOUND)
-        serializer = BranchManagerSerializer(manager)
+        serializer = CustomUserCreateSerializer(manager)
         return standarizedSuccessResponse(
             data=serializer.data,
-            message=f'Successfully retrieved Available School.',
+            message=f'Successfully retrieved Available Branch Manager.',
             status_code=status.HTTP_200_OK
         )
 
@@ -102,108 +105,109 @@ class BranchManagerpkAPIview(APIView):
             openapi.Parameter(
                 'pk',
                 openapi.IN_PATH,
-                description="Primary Key of the School",
+                description="Primary Key of the Branch Manager",
                 type=openapi.TYPE_INTEGER
                 )
         ],
         responses={
             200: openapi.Response(
-                'Successfully Deleted School.',
+                'Successfully Deleted Branch Manager.',
                 standarizedSuccessResponseSerializer
                 ),
             404: openapi.Response(
-                'Failed to delete school.',
+                'Failed to delete Branch Manager.',
                 standarizedErrorResponseSerializer
                 ),
         }
     )
     def delete(self, request, pk):
         try:
-            manager = self.queryset.objects.get(pk=pk)
+            manager = self.queryset.get(pk=pk)
         except:
             return standarizedErrorResponse(
                 message='Failed to delete Branch Manager.',
                 status_code=status.HTTP_404_NOT_FOUND)
 
-        manager.isdeleted = True
+        manager.is_active = False
+        manager.save()
         return standarizedSuccessResponse(
-            message=f'Successfully Deleted Branch Manager "{manager.name}"',
+            message=f'Successfully Deleted Branch Manager "{manager.email}"',
             status_code=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        request_body=BranchManagerSerializer,
+        request_body=CustomUserCreateSerializer,
         manual_parameters=[
             openapi.Parameter(
                 'pk',
                 openapi.IN_PATH,
-                description="Primary Key of the School",
+                description="Primary Key of the Branch Manager",
                 type=openapi.TYPE_INTEGER
                 )
         ],
         responses={
             200: openapi.Response(
-                'Successfully updated school.',
+                'Successfully updated Branch Manager.',
                 standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
-                'Failed to update school.',
+                'Failed to update Branch Manager.',
                 standarizedErrorResponseSerializer
                 ),
             404: openapi.Response(
-                'School not found.',
+                'Branch Manager not found.',
                 standarizedErrorResponseSerializer
                 ),
         }
     )
     def put(self, request, pk, format=None):
         try:
-            current_bm = self.queryset.objects.get(pk=pk)
-        except BranchManager.DoesNotExist:
+            current_bm = self.queryset.get(pk=pk)
+        except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
                 message="Branch Manager does'nt exist.",
                 status_code=status.HTTP_404_NOT_FOUND)
-        serializer = BranchManagerSerializer(current_bm, data=request.data)
+        serializer = CustomUserCreateSerializer(current_bm, data=request.data)
         if serializer.is_valid():
             updated_bm = serializer.save()
             return standarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully updated Branch Manager "{updated_bm.name}"',
+                message=f'Successfully updated Branch Manager "{updated_bm.email}"',
                 status_code=status.HTTP_200_OK)
         else:
             return standarizedErrorResponse(
                 details=serializer.errors,
-                message=f'Failed to update Branch Manager "{current_bm.name}".',
+                message=f'Failed to update Branch Manager "{current_bm.email}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
  
 class PrincipalAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = Principal.objects.filter(isdeleted=False)
+    queryset = CustomUserModel.objects.filter(is_active=False)
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [OR(IsAdminUser(),IsSchoolOwner,IsBranchManager)]
 
     @swagger_auto_schema(
-        request_body=PrincipalSerializer,
+        request_body=CustomUserCreateSerializer,
         responses={
             201: openapi.Response(
-                'Successfully created School.',
+                'Successfully created Principal.',
                 standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
-                'Failed to create School.',
+                'Failed to create Principal.',
                 standarizedErrorResponseSerializer
                 ),
         }
     )
     def post(self, request):
-        serializer = PrincipalSerializer(data=request.data)
+        serializer = CustomUserCreateSerializer(data=request.data)
         if serializer.is_valid():
-            created_principal = serializer.save()
+            created_user = serializer.save(role='principal')
             return standarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully created Principal "{created_principal.name}"',
+                message=f'Successfully created Principal "{created_user.email}"',
                 status_code=status.HTTP_201_CREATED)
         else:
             return standarizedErrorResponse(
@@ -214,7 +218,7 @@ class PrincipalAPIview(APIView):
 
 class PrincipalpkAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = Principal.objects.filter(isdeleted=False)
+    queryset = CustomUserModel.objects.filter(is_active=False)
 
     def get_permissions(self):
         if self.request.method == 'PUT':
@@ -227,15 +231,19 @@ class PrincipalpkAPIview(APIView):
     @swagger_auto_schema(
         responses={
             200: openapi.Response(
-                'Successfully Retrieved School.',
+                'Successfully Retrieved Principal.',
+                standarizedSuccessResponseSerializer
+                ),
+            404: openapi.Response(
+                'Principal not found.',
                 standarizedSuccessResponseSerializer
                 ),
         },
         manual_parameters=[
             openapi.Parameter(
                 'pk',
-                openapi.IN_QUERY,
-                description="Primary Key of the School",
+                openapi.IN_PATH,
+                description="Primary Key of the Principal",
                 type=openapi.TYPE_INTEGER,
                 # required=False
                 )
@@ -243,15 +251,15 @@ class PrincipalpkAPIview(APIView):
     )
     def get(self, request, pk):
         try:
-            principal = self.queryset.objects.get(pk=pk)
+            principal = self.queryset.get(pk=pk)
         except:
             return standarizedErrorResponse(
-                message='Failed to retrieve School.',
+                message='Principal not found.',
                 status_code=status.HTTP_404_NOT_FOUND)
-        serializer = PrincipalSerializer(principal)
+        serializer = CustomUserCreateSerializer(principal)
         return standarizedSuccessResponse(
             data=serializer.data,
-            message=f'Successfully retrieved Available School.',
+            message=f'Successfully retrieved Available Principal.',
             status_code=status.HTTP_200_OK
         )
 
@@ -260,7 +268,7 @@ class PrincipalpkAPIview(APIView):
             openapi.Parameter(
                 'pk',
                 openapi.IN_PATH,
-                description="Primary Key of the School",
+                description="Primary Key of the Principal",
                 type=openapi.TYPE_INTEGER
                 )
         ],
@@ -270,28 +278,29 @@ class PrincipalpkAPIview(APIView):
                 standarizedSuccessResponseSerializer
                 ),
             404: openapi.Response(
-                'Failed to delete school.',
+                'Principal not found.',
                 standarizedErrorResponseSerializer
                 ),
         }
     )
     def delete(self, request, pk):
         try:
-            principal = self.queryset.objects.get(pk=pk)
-        except Principal.DoesNotExist:
+            principal = self.queryset.get(pk=pk)
+        except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
-                message='Failed to delete school.',
+                message='Principal not found.',
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        principal.isdeleted = True
+        principal.is_active = False
+        principal.save()
         return standarizedSuccessResponse(
-            message=f'Successfully Deleted School "{principal.name}"',
+            message=f'Successfully Deleted School "{principal.email}"',
             status_code=status.HTTP_200_OK
         )
 
     @swagger_auto_schema(
-        request_body=PrincipalSerializer,
+        request_body=CustomUserCreateSerializer,
         manual_parameters=[
             openapi.Parameter(
                 'pk',
@@ -317,35 +326,35 @@ class PrincipalpkAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_principal = self.queryset.objects.get(pk=pk)
-        except Principal.DoesNotExist:
+            current_principal = self.queryset.get(pk=pk)
+        except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
                 message="Principal does'nt exist.",
                 status_code=status.HTTP_404_NOT_FOUND)
-        serializer = PrincipalSerializer(current_principal, data=request.data)
+        serializer = CustomUserCreateSerializer(current_principal, data=request.data)
         if serializer.is_valid():
             updated_principal = serializer.save()
             return standarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully updated Principal "{updated_principal.name}"',
+                message=f'Successfully updated Principal "{updated_principal.email}"',
                 status_code=status.HTTP_200_OK)
         else:
             return standarizedErrorResponse(
                 details=serializer.errors,
-                message=f'Failed to update principal "{current_principal.name}".',
+                message=f'Failed to update principal "{current_principal.email}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
  
 
 class OwnerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = SchoolOwner.objects.filter(isdeleted=False)
+    queryset = CustomUserModel.objects.filter(is_active=False)
 
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsAdminUser()]
         
     @swagger_auto_schema(
-        request_body=SchoolOwnerSerializer,
+        request_body=CustomUserCreateSerializer,
         responses={
             201: openapi.Response(
                 'Successfully created School.',
@@ -358,12 +367,12 @@ class OwnerAPIview(APIView):
         }
     )
     def post(self, request):
-        serializer = SchoolOwnerSerializer(data=request.data)
+        serializer = CustomUserCreateSerializer(data=request.data)
         if serializer.is_valid():
-            created_owner = serializer.save()
+            created_user = serializer.save(role='owner')
             return standarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully created Owner "{created_owner.name}"',
+                message=f'Successfully created Owner "{created_user.email}"',
                 status_code=status.HTTP_201_CREATED)
         else:
             return standarizedErrorResponse(
@@ -371,12 +380,13 @@ class OwnerAPIview(APIView):
                 message='Failed to create Owner.',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
+
 class OwnerpkAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = SchoolOwner.objects.filter(isdeleted=False)
+    queryset = CustomUserModel.objects.filter(is_active=False)
 
-    def get_queryset(self):
-        return self.queryset.all()
+    # def get_queryset(self):
+    #     return self.queryset.all()
 
     def get_permissions(self):
         if self.request.method == 'PUT':
@@ -396,7 +406,7 @@ class OwnerpkAPIview(APIView):
         manual_parameters=[
             openapi.Parameter(
                 'pk',
-                openapi.IN_QUERY,
+                openapi.IN_PATH,
                 description="Primary Key of the School",
                 type=openapi.TYPE_INTEGER,
                 # required=False
@@ -405,13 +415,13 @@ class OwnerpkAPIview(APIView):
     )
     def get(self, request, pk):
         try:
-            owner = self.queryset.objects.get(pk=pk)
+            owner = self.queryset.get(pk=pk)
         except:
             return standarizedErrorResponse(
                 message='Failed to retrieve School.',
                 status_code=status.HTTP_404_NOT_FOUND)
             
-        serializer = SchoolOwnerSerializer(owner)
+        serializer = CustomUserCreateSerializer(owner)
 
         return standarizedSuccessResponse(
             data=serializer.data,
@@ -441,21 +451,22 @@ class OwnerpkAPIview(APIView):
     )
     def delete(self, request, pk):
         try:
-            school_owner = self.queryset.objects.get(pk=pk)
-        except SchoolOwner.DoesNotExist:
+            school_owner = self.queryset.get(pk=pk)
+        except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
                 message='Failed to delete school.',
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        school_owner.isdeleted = True
+        school_owner.is_active = False
+        school_owner.save()
         return standarizedSuccessResponse(
-            message=f'Successfully Deleted School "{school_owner.name}"',
+            message=f'Successfully Deleted School Owner"{school_owner.email}"',
             status_code=status.HTTP_200_OK
         )
 
     @swagger_auto_schema(
-        request_body=SchoolOwnerSerializer,
+        request_body=CustomUserCreateSerializer,
         manual_parameters=[
             openapi.Parameter(
                 'pk',
@@ -481,21 +492,21 @@ class OwnerpkAPIview(APIView):
     )
     def put(self, request, pk, format=None):
         try:
-            current_owner = self.queryset.objects.get(pk=pk)
-        except SchoolOwner.DoesNotExist:
+            current_owner = self.queryset.get(pk=pk)
+        except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
                 message="Owner does'nt exist.",
                 status_code=status.HTTP_404_NOT_FOUND)
-        serializer = SchoolOwnerSerializer(current_owner, data=request.data)
+        serializer = CustomUserCreateSerializer(current_owner, data=request.data)
         if serializer.is_valid():
             updated_owner = serializer.save()
             return standarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully updated Owner "{updated_owner.name}"',
+                message=f'Successfully updated Owner "{updated_owner.email}"',
                 status_code=status.HTTP_200_OK)
         else:
             return standarizedErrorResponse(
                 details=serializer.errors,
-                message=f'Failed to update Owner "{current_owner.name}".',
+                message=f'Failed to update Owner "{current_owner.email}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
  

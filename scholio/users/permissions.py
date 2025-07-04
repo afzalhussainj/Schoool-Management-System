@@ -7,7 +7,13 @@ class IsSchoolOwner(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return SchoolOwner.objects.filter(request.user).exists()
+        return bool(
+            request.user 
+            and 
+            request.user.is_authenticated
+            and 
+            request.use.role == 'manager'
+            )
     
 class IsBranchManager(permissions.BasePermission):
     """
@@ -15,4 +21,10 @@ class IsBranchManager(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return BranchManager.objects.filter(request.user).exists()
+        return (
+            request.user 
+            and 
+            request.user.is_authenticated
+            and 
+            request.use.role == 'manager'
+            )

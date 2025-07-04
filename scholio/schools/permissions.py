@@ -1,12 +1,19 @@
 from rest_framework import permissions
-from users.models import SchoolOwner,BranchManager
+from .models import *
+
 class IsSchoolOwner(permissions.BasePermission):
     """
     Check for if the user is the owner of School.
     """
 
     def has_permission(self, request, view):
-        return SchoolOwner.objects.filter(request.user).exists()
+        return bool(
+            request.user 
+            and 
+            request.user.is_authenticated
+            and 
+            request.use.role == 'manager'
+            )
     
 class IsBranchManager(permissions.BasePermission):
     """
@@ -14,4 +21,10 @@ class IsBranchManager(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return BranchManager.objects.filter(request.user).exists()
+        return (
+            request.user 
+            and 
+            request.user.is_authenticated
+            and 
+            request.use.role == 'manager'
+            )
