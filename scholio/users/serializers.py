@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from django.contrib.auth import get_user_model,authenticate
 from rest_framework_simplejwt.tokens import AccessToken,RefreshToken
 from utils.StandardResponse import standarizedErrorResponse,standarizedSuccessResponse
@@ -40,9 +41,9 @@ class LoginSerializer(serializers.ModelSerializer):
                 if user.is_active:
                     data['user'] = user
                 else:
-                    data['message'] = 'Your account is disabled.'
+                    raise ValidationError('Your account is disabled.')
             else:
-                data['message'] = 'Wrong email or password.'
+                ValidationError('Wrong email or password.')
         else:
-            data['message'] = 'Email or Password not provided.'
+            ValidationError('Email or Password not provided.')
         return data

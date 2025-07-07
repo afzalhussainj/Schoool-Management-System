@@ -352,9 +352,24 @@ class OwnerpkAPIview(APIView):
  
 
 class LoginAPIview(APIView):
+    permission_classes=[AllowAny]
+
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={
+            200: openapi.Response(
+                'Successfully logged in.',
+                standarizedSuccessResponseSerializer
+                ),
+            400: openapi.Response(
+                'Failed to log in.',
+                standarizedErrorResponseSerializer
+                ),
+        }
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid:
+        if serializer.is_valid():
             user = serializer.validated_data['user']
             refresh = RefreshToken.for_user(user=user)
             access = refresh.access_token
@@ -370,6 +385,8 @@ class LoginAPIview(APIView):
             )
         else:
             return standarizedErrorResponse(
-                message=''
+                message=serializer.error_messages,
+                data=serializer.errors,
+                status_code=status.HTTP_400_BAD_REQUEST
             )
 
