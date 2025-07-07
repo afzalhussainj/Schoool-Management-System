@@ -47,3 +47,7 @@ class LoginSerializer(serializers.ModelSerializer):
         else:
             ValidationError('Email or Password not provided.')
         return data
+    
+    class Meta:
+        model = CustomUserModel
+        fields = ['email','password'] 
