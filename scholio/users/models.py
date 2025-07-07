@@ -1,6 +1,7 @@
 from django.db import models
 from schools.models import SchoolBranch
-from django.contrib.auth.models import AbstractUser,BaseUserManager
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.conf import settings
 
 # Create your models here.
 
@@ -26,8 +27,38 @@ class CustomUserManager(BaseUserManager):
         user.role = 'admin'
         return user
 
-class CustomUserModel(AbstractUser):
-    username = None
+class AutoUserFields(models.Model):
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(blank=True)
+
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name='updated_%(class)s',
+        null=True,
+        blank=True
+        )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name='created_%(class)s',
+        null=True,
+        blank=True
+        )
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name='deleted_%(class)s',
+        null=True,
+        blank=True
+        )
+
+    class Meta:
+        abstract = True
+
+
+class CustomUserModel(AbstractBaseUser, AutoUserFields):
     email = models.EmailField(blank=False, unique=True)
     role_choices = (
         ('admin','Main Admin'),
@@ -41,7 +72,7 @@ class CustomUserModel(AbstractUser):
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['password']
+    REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 

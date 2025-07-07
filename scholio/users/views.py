@@ -14,6 +14,7 @@ from utils.StandardResponse_serializers import (
 from schools.models import School
 from .serializers import *
 from .permissions import IsBranchManager, IsSchoolOwner
+from django.utils import timezone
 
 # Create your views here.
 
@@ -129,6 +130,8 @@ class BranchManagerpkAPIview(APIView):
                 status_code=status.HTTP_404_NOT_FOUND)
 
         manager.is_active = False
+        manager.deleted_at = timezone.now()
+        manager.deleted_by = self.request.user
         manager.save()
         return standarizedSuccessResponse(
             message=f'Successfully Deleted Branch Manager "{manager.email}"',
@@ -294,6 +297,8 @@ class OwnerpkAPIview(APIView):
             )
 
         school_owner.is_active = False
+        school_owner.deleted_at = timezone.now()
+        school_owner.deleted_by = self.request.user
         school_owner.save()
         return standarizedSuccessResponse(
             message=f'Successfully Deleted School Owner"{school_owner.email}"',
@@ -345,3 +350,26 @@ class OwnerpkAPIview(APIView):
                 message=f'Failed to update Owner "{current_owner.email}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
  
+
+class LoginAPIview(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid:
+            user = serializer.validated_data['user']
+            refresh = RefreshToken.for_user(user=user)
+            access = refresh.access_token
+            return standarizedSuccessResponse(
+                message='User Successfully logined.',
+                data={
+                    'user':user,
+                    'user_email':user.email,
+                    'access':access,
+                    'refresh':refresh
+                },
+                status_code=status.HTTP_200_OK
+            )
+        else:
+            return standarizedErrorResponse(
+                message=''
+            )
+
