@@ -8,6 +8,7 @@ from rest_framework import routers
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework.permissions import AllowAny
+from users.views import LoginAPIview
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -24,6 +25,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('login/',LoginAPIview.as_view(),name='login'),
     path('users/',include('users.urls')),
     path('schools/',include('schools.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
