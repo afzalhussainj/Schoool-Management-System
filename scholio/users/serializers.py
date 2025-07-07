@@ -8,9 +8,16 @@ from .models import *
 
 class CustomUserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    profile_pic = serializers.ImageField(
+        max_length=None,
+        use_url=True,
+        allow_null=True,
+        required=False
+        )
 
     def create(self, validated_data):
         role = validated_data.pop('role', None)
+        profile_pic = validated_data.pop('profile_pic', None)
         request = self.context.get('request')
         created_by = request.user if request and request.user.is_authenticated else None
         user = CustomUserModel.objects.create_user(
@@ -20,22 +27,18 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
             )
         if role:
             user.role = role
+        if profile_pic:
+            user.profile_pic = profile_pic
         user.save()
         return user
 
     class Meta:
         model = CustomUserModel
-        fields = ['email','password','role']
+        fields = ['email','password','role','profile_pic']
 
 class LoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type':'password'})
     email = serializers.EmailField()
-    profile_pic = serializers.ImageField(
-        max_length=None,
-        use_url=True,
-        allow_null=True,
-        required=False
-        )
 
     def validate(self, data):
         email = data.get('email')

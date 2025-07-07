@@ -2,6 +2,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAdminUser,AllowAny,OR
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg import openapi
@@ -186,6 +187,7 @@ class BranchManagerpkAPIview(APIView):
 class OwnerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = CustomUserModel.objects.filter(is_active=False)
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.request.method == 'POST':

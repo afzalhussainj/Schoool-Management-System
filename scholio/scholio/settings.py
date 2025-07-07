@@ -140,20 +140,13 @@ SIMPLE_JWT = {
    }
 
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-      'scholio - Swagger': {
-         'type': 'oauth2',
-         'authorizationUrl': '/login/',
-         'tokenUrl': '/api/token/',
-         'flow': 'accessCode',
-         'scopes': {
-          'read:groups': 'read groups',
-         }}},
-    'Bearer': {
-        'type': 'apiKey',
-        'name': 'Authorization',
-        'in': 'header'
+      'SECURITY_DEFINITIONS': {
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
       },
+   }
 }
 
 AUTH_USER_MODEL = 'users.CustomUserModel'
