@@ -374,13 +374,14 @@ class LoginAPIview(APIView):
             if user:
                 refresh = RefreshToken.for_user(user=user)
                 access = refresh.access_token
+                user_data = UserDetailsSerializer(user).data
                 return standarizedSuccessResponse(
                     message='User Successfully logined.',
                     data={
-                        'user':user,
+                        'user':user_data,
                         'user_email':user.email,
-                        'access':access,
-                        'refresh':refresh
+                        'access':str(access),
+                        'refresh':str(refresh)
                     },
                     status_code=status.HTTP_200_OK
                 )

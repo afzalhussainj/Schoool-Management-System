@@ -30,7 +30,7 @@ class CustomUserManager(BaseUserManager):
 class AutoUserFields(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    deleted_at = models.DateTimeField(blank=True)
+    deleted_at = models.DateTimeField(blank=True,null=True)
 
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
