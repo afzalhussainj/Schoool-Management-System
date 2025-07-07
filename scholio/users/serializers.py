@@ -30,6 +30,12 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type':'password'})
     email = serializers.EmailField()
+    profile_pic = serializers.ImageField(
+        max_length=None,
+        use_url=True,
+        allow_null=True,
+        required=False
+        )
 
     def validate(self, data):
         email = data.get('email')
@@ -56,4 +62,4 @@ class LoginSerializer(serializers.ModelSerializer):
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUserModel
-        fields = ['email'] 
+        fields = ['email','profile_pic'] 

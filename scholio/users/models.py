@@ -60,6 +60,11 @@ class AutoUserFields(models.Model):
 
 class CustomUserModel(AbstractBaseUser, AutoUserFields):
     email = models.EmailField(blank=False, unique=True)
+    profile_pic = models.ImageField(
+        upload_to="profile_pics/",
+        null=True,
+        blank=True
+        )
     role_choices = (
         ('admin','Main Admin'),
         ('owner','School Owner'),
