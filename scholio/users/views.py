@@ -370,19 +370,20 @@ class LoginAPIview(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.validated_data['user']
-            refresh = RefreshToken.for_user(user=user)
-            access = refresh.access_token
-            return standarizedSuccessResponse(
-                message='User Successfully logined.',
-                data={
-                    'user':user,
-                    'user_email':user.email,
-                    'access':access,
-                    'refresh':refresh
-                },
-                status_code=status.HTTP_200_OK
-            )
+            user = serializer.validated_data.get('user')
+            if user:
+                refresh = RefreshToken.for_user(user=user)
+                access = refresh.access_token
+                return standarizedSuccessResponse(
+                    message='User Successfully logined.',
+                    data={
+                        'user':user,
+                        'user_email':user.email,
+                        'access':access,
+                        'refresh':refresh
+                    },
+                    status_code=status.HTTP_200_OK
+                )
         else:
             return standarizedErrorResponse(
                 message=serializer.error_messages,

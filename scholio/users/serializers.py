@@ -43,9 +43,9 @@ class LoginSerializer(serializers.ModelSerializer):
                 else:
                     raise ValidationError('Your account is disabled.')
             else:
-                ValidationError('Wrong email or password.')
+                raise serializers.ValidationError('Wrong email or password.')
         else:
-            ValidationError('Email or Password not provided.')
+            raise serializers.ValidationError('Email or Password not provided.')
         return data
     
     class Meta:
