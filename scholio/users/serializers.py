@@ -31,7 +31,7 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUserModel
-        fields = ['email','password','role','profile_pic']
+        fields = ['email','password','profile_pic']
 
 class LoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type':'password'})
