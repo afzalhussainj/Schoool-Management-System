@@ -19,7 +19,7 @@ from django.utils import timezone
 
 # Create your views here.
 
-class CustomUserAPIview(APIView):
+class BranchManagerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = CustomUserModel.objects.filter(is_active=True)
     parser_classes = [MultiPartParser, FormParser]
@@ -29,15 +29,15 @@ class CustomUserAPIview(APIView):
             return [OR(IsAdminUser(),IsSchoolOwner)]
     
     @swagger_auto_schema(
-        tags=['User'],
+        tags=['User Creations'],
         request_body=CustomUserCreateSerializer,
         responses={
             201: openapi.Response(
-                'Successfully created User.',
+                'Successfully created Branch Manager.',
                 standarizedSuccessResponseSerializer
                 ),
             400: openapi.Response(
-                'Failed to create User.',
+                'Failed to create Branch Manager.',
                 standarizedErrorResponseSerializer
                 ),
         }
@@ -45,22 +45,16 @@ class CustomUserAPIview(APIView):
     def post(self, request):
         serializer = CustomUserCreateSerializer(data=request.data)
         if serializer.is_valid():
-            created_user = serializer.save()
+            created_user = serializer.save(role = 'manager')
             return standarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully created user "{created_user.email}", with role of "{created_user.role}"',
+                message=f'Successfully created Branch Manager "{created_user.email}".',
                 status_code=status.HTTP_201_CREATED)
         else:
             return standarizedErrorResponse(
                 details=serializer.errors,
-                message='Failed to create User.',
-                status_code=status.HTTP_400_BAD_REQUEST
-                )
-
-
-class CustomUseruuidAPIview(APIView):
-    authentication_classes = [JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=True)
+                message='Failed to create Branch manager.',
+                status_code=status.HTTP_400_BAD_REQUEST)
 
 
 class BranchManageruuidAPIview(APIView):
@@ -76,14 +70,14 @@ class BranchManageruuidAPIview(APIView):
             return [AllowAny()]
     
     @swagger_auto_schema(
-        tags=['User'],
+        tags=['User Details'],
         responses={
             200: openapi.Response(
-                'Successfully Retrieved User.',
+                'Successfully Retrieved Branch manager.',
                 standarizedSuccessResponseSerializer
                 ),
             404: openapi.Response(
-                'Failed to Retrieved User.',
+                'Failed to Retrieved Branch manager.',
                 standarizedSuccessResponseSerializer
                 ),
         },
@@ -198,6 +192,44 @@ format='uuid',
                 status_code=status.HTTP_400_BAD_REQUEST)
 
  
+class OwnerAPIview(APIView):
+    authentication_classes = [JWTAuthentication]
+    queryset = CustomUserModel.objects.filter(is_active=True)
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAdminUser()]
+        
+    @swagger_auto_schema(
+        tags=['User Creations'],
+        request_body=CustomUserCreateSerializer,
+        responses={
+            201: openapi.Response(
+                'Successfully created School.',
+                standarizedSuccessResponseSerializer
+                ),
+            400: openapi.Response(
+                'Failed to create School.',
+                standarizedErrorResponseSerializer
+                ),
+        }
+    )
+    def post(self, request):
+        serializer = CustomUserCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            created_user = serializer.save(role='owner')
+            return standarizedSuccessResponse(
+                data=serializer.data,
+                message=f'Successfully created Owner "{created_user.email}"',
+                status_code=status.HTTP_201_CREATED)
+        else:
+            return standarizedErrorResponse(
+                details=serializer.errors,
+                message='Failed to create Owner.',
+                status_code=status.HTTP_400_BAD_REQUEST)
+
+
 class OwneruuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = CustomUserModel.objects.filter(is_active=True)
@@ -237,7 +269,7 @@ format='uuid',
             owner = self.queryset.get(uuid=uuid)
         except:
             return standarizedErrorResponse(
-                message='Failed to retrieve School.',
+                message='School Owner not found.',
                 status_code=status.HTTP_404_NOT_FOUND)
             
         serializer = CustomUserCreateSerializer(owner)
@@ -360,7 +392,7 @@ class LoginAPIview(APIView):
             if user:
                 refresh = RefreshToken.for_user(user=user)
                 access = refresh.access_token
-                user_data = UserDetailsSerializer(user).data
+                user_data = CustomUserDetailsSerializer(user).data
                 return standarizedSuccessResponse(
                     message='User Successfully logined.',
                     data={

@@ -17,17 +17,15 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         role = validated_data.pop('role', None)
-        profile_pic = validated_data.pop('profile_pic', None)
         request = self.context.get('request')
         created_by = request.user if request and request.user.is_authenticated else None
         user = CustomUserModel.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
-            created_by = created_by,
-            role = role
+            created_by = created_by
             )
-        if profile_pic:
-            user.profile_pic = profile_pic
+        if role:
+            user.role = role
         user.save()
         return user
 
@@ -61,7 +59,7 @@ class LoginSerializer(serializers.ModelSerializer):
         fields = ['email','password'] 
 
 
-class UserDetailsSerializer(serializers.ModelSerializer):
+class CustomUserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUserModel
-        fields = ['email','profile_pic'] 
+        fields = ['email','profile_pic','role'] 
