@@ -23,10 +23,9 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
         user = CustomUserModel.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
-            created_by = created_by
+            created_by = created_by,
+            role = role
             )
-        if role:
-            user.role = role
         if profile_pic:
             user.profile_pic = profile_pic
         user.save()
