@@ -28,6 +28,7 @@ class BranchManagerAPIview(APIView):
             return [OR(IsAdminUser(),IsSchoolOwner)]
     
     @swagger_auto_schema(
+        tags=['User Creations'],
         request_body=CustomUserCreateSerializer,
         responses={
             201: openapi.Response(
@@ -55,7 +56,7 @@ class BranchManagerAPIview(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST)
 
 
-class BranchManagerpkAPIview(APIView):
+class BranchManageruuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = CustomUserModel.objects.filter(is_active=False)
 
@@ -68,6 +69,7 @@ class BranchManagerpkAPIview(APIView):
             return [AllowAny()]
     
     @swagger_auto_schema(
+        tags=['User Details'],
         responses={
             200: openapi.Response(
                 'Successfully Retrieved Branch manager.',
@@ -80,7 +82,7 @@ class BranchManagerpkAPIview(APIView):
         },
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the Branch manager",
                 type=openapi.TYPE_INTEGER,
@@ -88,9 +90,9 @@ class BranchManagerpkAPIview(APIView):
                 )
         ],
     )
-    def get(self, request, pk):
+    def get(self, request, uuid):
         try:
-            manager = self.queryset.get(pk=pk)
+            manager = self.queryset.get(uuid=uuid)
         except:
             return standarizedErrorResponse(
                 message='Failed to retrieve Branch Manager.',
@@ -103,9 +105,10 @@ class BranchManagerpkAPIview(APIView):
         )
 
     @swagger_auto_schema(
+        tags=['User Deletions'],
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the Branch Manager",
                 type=openapi.TYPE_INTEGER
@@ -122,9 +125,9 @@ class BranchManagerpkAPIview(APIView):
                 ),
         }
     )
-    def delete(self, request, pk):
+    def delete(self, request, uuid):
         try:
-            manager = self.queryset.get(pk=pk)
+            manager = self.queryset.get(uuid=uuid)
         except:
             return standarizedErrorResponse(
                 message='Failed to delete Branch Manager.',
@@ -139,10 +142,11 @@ class BranchManagerpkAPIview(APIView):
             status_code=status.HTTP_200_OK)
 
     @swagger_auto_schema(
+        tags=['User Updates'],
         request_body=CustomUserCreateSerializer,
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the Branch Manager",
                 type=openapi.TYPE_INTEGER
@@ -163,9 +167,9 @@ class BranchManagerpkAPIview(APIView):
                 ),
         }
     )
-    def put(self, request, pk, format=None):
+    def put(self, request, uuid, format=None):
         try:
-            current_bm = self.queryset.get(pk=pk)
+            current_bm = self.queryset.get(uuid=uuid)
         except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
                 message="Branch Manager does'nt exist.",
@@ -194,6 +198,7 @@ class OwnerAPIview(APIView):
             return [IsAdminUser()]
         
     @swagger_auto_schema(
+        tags=['User Creations'],
         request_body=CustomUserCreateSerializer,
         responses={
             201: openapi.Response(
@@ -221,7 +226,7 @@ class OwnerAPIview(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST)
 
 
-class OwnerpkAPIview(APIView):
+class OwneruuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = CustomUserModel.objects.filter(is_active=False)
 
@@ -237,6 +242,7 @@ class OwnerpkAPIview(APIView):
             return [AllowAny()]
         
     @swagger_auto_schema(
+        tags=['User Details'],
         responses={
             200: openapi.Response(
                 'Successfully Retrieved School.',
@@ -245,7 +251,7 @@ class OwnerpkAPIview(APIView):
         },
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the School",
                 type=openapi.TYPE_INTEGER,
@@ -253,9 +259,9 @@ class OwnerpkAPIview(APIView):
                 )
         ],
     )
-    def get(self, request, pk):
+    def get(self, request, uuid):
         try:
-            owner = self.queryset.get(pk=pk)
+            owner = self.queryset.get(uuid=uuid)
         except:
             return standarizedErrorResponse(
                 message='Failed to retrieve School.',
@@ -270,9 +276,10 @@ class OwnerpkAPIview(APIView):
         )
 
     @swagger_auto_schema(
+        tags=['User Deletions'],
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the School",
                 type=openapi.TYPE_INTEGER
@@ -289,9 +296,9 @@ class OwnerpkAPIview(APIView):
                 ),
         }
     )
-    def delete(self, request, pk):
+    def delete(self, request, uuid):
         try:
-            school_owner = self.queryset.get(pk=pk)
+            school_owner = self.queryset.get(uuid=uuid)
         except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
                 message='Failed to delete school.',
@@ -308,10 +315,11 @@ class OwnerpkAPIview(APIView):
         )
 
     @swagger_auto_schema(
+        tags=['User Updates'],
         request_body=CustomUserCreateSerializer,
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the School",
                 type=openapi.TYPE_INTEGER
@@ -332,9 +340,9 @@ class OwnerpkAPIview(APIView):
                 ),
         }
     )
-    def put(self, request, pk, format=None):
+    def put(self, request, uuid, format=None):
         try:
-            current_owner = self.queryset.get(pk=pk)
+            current_owner = self.queryset.get(uuid=uuid)
         except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
                 message="Owner does'nt exist.",
@@ -357,6 +365,7 @@ class LoginAPIview(APIView):
     permission_classes=[AllowAny]
 
     @swagger_auto_schema(
+        tags=['Login'],
         request_body=LoginSerializer,
         responses={
             200: openapi.Response(

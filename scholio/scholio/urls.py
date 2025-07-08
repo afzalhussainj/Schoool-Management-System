@@ -30,7 +30,15 @@ urlpatterns = [
     path('login/',LoginAPIview.as_view(),name='login'),
     path('users/',include('users.urls')),
     path('schools/',include('schools.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    #JWT
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    #swagger
     path('api-docs/', schema_view.with_ui('swagger', cache_timeout=0), name='api-docs'),
-]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+    path('swagger.yaml', schema_view.without_ui(cache_timeout=0), name='schema-yaml'),
+]+static(
+    settings.MEDIA_URL,
+    document_root=settings.MEDIA_ROOT
+    )

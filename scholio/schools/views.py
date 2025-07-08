@@ -29,6 +29,7 @@ class SchoolAPIView(APIView):
             return [permissions.AllowAny()]
 
     @swagger_auto_schema(
+        auto_schema=None,
         request_body=SchoolSerializer,
         responses={
             201: openapi.Response(
@@ -57,6 +58,7 @@ class SchoolAPIView(APIView):
         )
     
     @swagger_auto_schema(
+        auto_schema=None,
         responses={
             200: openapi.Response(
                 'Successfully listed available School.',
@@ -73,7 +75,7 @@ class SchoolAPIView(APIView):
             )
 
 
-class SchoolpkAPIView(APIView):
+class SchooluuidAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = School.objects.filter(isdeleted=False)
 
@@ -86,6 +88,7 @@ class SchoolpkAPIView(APIView):
             return [permissions.AllowAny()]
     
     @swagger_auto_schema(
+        auto_schema=None,
         responses={
             200: openapi.Response(
                 'Successfully Retrieved School.',
@@ -94,7 +97,7 @@ class SchoolpkAPIView(APIView):
         },
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_QUERY,
                 description="Primary Key of the School",
                 type=openapi.TYPE_INTEGER,
@@ -102,9 +105,9 @@ class SchoolpkAPIView(APIView):
                 )
         ],
     )
-    def get(self, request, pk):
+    def get(self, request, uuid):
         try:
-            school = self.queryset.objects.get(pk=pk)
+            school = self.queryset.objects.get(uuid=uuid)
         except:
             return standarizedErrorResponse(
                 message='Failed to retrieve School.',
@@ -119,9 +122,10 @@ class SchoolpkAPIView(APIView):
         )
 
     @swagger_auto_schema(
+        auto_schema=None,
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the School",
                 type=openapi.TYPE_INTEGER)
@@ -137,9 +141,9 @@ class SchoolpkAPIView(APIView):
                 ),
         }
     )
-    def delete(self, request, pk):
+    def delete(self, request, uuid):
         try:
-            school = self.queryset.objects.get(pk=pk)
+            school = self.queryset.objects.get(uuid=uuid)
         except School.DoesNotExist:
             return standarizedErrorResponse(
                 message='Failed to delete school.',
@@ -153,10 +157,11 @@ class SchoolpkAPIView(APIView):
         )
 
     @swagger_auto_schema(
+        auto_schema=None,
         request_body=SchoolSerializer,
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the School",
                 type=openapi.TYPE_INTEGER)
@@ -176,9 +181,9 @@ class SchoolpkAPIView(APIView):
                 ),
         }
     )
-    def put(self, request, pk):
+    def put(self, request, uuid):
         try:
-            school = self.queryset.objects.get(pk=pk)
+            school = self.queryset.objects.get(uuid=uuid)
         except School.DoesNotExist:
             return standarizedErrorResponse(
                 message="School doesn't exist.",
@@ -209,6 +214,7 @@ class SchoolBranchAPIview(APIView):
             return [permissions.IsAdminUser()|IsSchoolOwner]
 
     @swagger_auto_schema(
+        auto_schema=None,
         request_body=SchoolBranchSerializer,
         responses={
             201: openapi.Response(
@@ -236,7 +242,7 @@ class SchoolBranchAPIview(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST)
 
 
-class SchoolBranchpkAPIview(APIView):
+class SchoolBranchuuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = SchoolBranch.objects.filter(isdeleted=False)
 
@@ -249,6 +255,7 @@ class SchoolBranchpkAPIview(APIView):
             return [permissions.AllowAny()]
 
     @swagger_auto_schema(
+        auto_schema=None,
         responses={
             200: openapi.Response(
                 'Successfully Retrieved School Branch.',
@@ -257,7 +264,7 @@ class SchoolBranchpkAPIview(APIView):
         },
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_QUERY,
                 description="Primary Key of the School Branch",
                 type=openapi.TYPE_INTEGER,
@@ -265,9 +272,9 @@ class SchoolBranchpkAPIview(APIView):
                 )
         ],
     )
-    def get(self, request, pk):
+    def get(self, request, uuid):
         try:
-            branch = self.queryset.objects.get(pk=pk)
+            branch = self.queryset.objects.get(uuid=uuid)
         except:
             return standarizedErrorResponse(
                 message='Failed to retrieve School Branch.',
@@ -283,17 +290,18 @@ class SchoolBranchpkAPIview(APIView):
         )
 
     @swagger_auto_schema(
+        auto_schema=None,
         manual_parameters=[
-            openapi.Parameter('pk', openapi.IN_PATH, description="Primary Key of the School Branch", type=openapi.TYPE_INTEGER)
+            openapi.Parameter('uuid', openapi.IN_PATH, description="Primary Key of the School Branch", type=openapi.TYPE_INTEGER)
         ],
         responses={
             200: openapi.Response('Successfully Deleted School Branch.', standarizedSuccessResponseSerializer),
             404: openapi.Response('Failed to delete school Branch.', standarizedErrorResponseSerializer),
         }
     )
-    def delete(self, request, pk):
+    def delete(self, request, uuid):
         try:
-            branch = self.queryset.objects.get(pk=pk)
+            branch = self.queryset.objects.get(uuid=uuid)
         except:
             return standarizedErrorResponse(
                 message='Failed to delete school Branch.',
@@ -305,10 +313,11 @@ class SchoolBranchpkAPIview(APIView):
             status_code=status.HTTP_200_OK)
 
     @swagger_auto_schema(
+        auto_schema=None,
         request_body=SchoolBranchSerializer,
         manual_parameters=[
             openapi.Parameter(
-                'pk',
+                'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the School Branch",
                 type=openapi.TYPE_INTEGER
@@ -329,9 +338,9 @@ class SchoolBranchpkAPIview(APIView):
                 ),
         }
     )
-    def put(self, request, pk, format=None):
+    def put(self, request, uuid, format=None):
         try:
-            current_branch = self.queryset.objects.get(pk=pk)
+            current_branch = self.queryset.objects.get(uuid=uuid)
         except SchoolBranch.DoesNotExist:
             return standarizedErrorResponse(
                 message="School branch does'nt exist.",

@@ -2,6 +2,7 @@ from django.db import models
 from schools.models import SchoolBranch
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.conf import settings
+import uuid
 
 # Create your models here.
 
@@ -28,6 +29,13 @@ class CustomUserManager(BaseUserManager):
         return user
 
 class AutoUserFields(models.Model):
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True
+        )
+
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(blank=True,null=True)
