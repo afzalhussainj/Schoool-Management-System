@@ -228,7 +228,7 @@ class OwnerAPIview(APIView):
 
 class OwneruuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=False)
+    queryset = CustomUserModel.objects.filter(is_active=True)
 
     # def get_queryset(self):
     #     return self.queryset.all()
@@ -254,7 +254,8 @@ class OwneruuidAPIview(APIView):
                 'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the School",
-                type=openapi.TYPE_INTEGER,
+                type=openapi.TYPE_STRING,
+                format='uuid',
                 # required=False
                 )
         ],
