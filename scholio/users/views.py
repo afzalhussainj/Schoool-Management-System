@@ -21,7 +21,8 @@ from django.utils import timezone
 
 class BranchManagerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=False)
+    queryset = CustomUserModel.objects.filter(is_active=True)
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -58,7 +59,7 @@ class BranchManagerAPIview(APIView):
 
 class BranchManageruuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=False)
+    queryset = CustomUserModel.objects.filter(is_active=True)
 
     def get_permissions(self):
         if self.request.method == 'PUT':
@@ -85,7 +86,8 @@ class BranchManageruuidAPIview(APIView):
                 'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the Branch manager",
-                type=openapi.TYPE_INTEGER,
+                type=openapi.TYPE_STRING,
+format='uuid',
                 # required=False
                 )
         ],
@@ -111,7 +113,8 @@ class BranchManageruuidAPIview(APIView):
                 'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the Branch Manager",
-                type=openapi.TYPE_INTEGER
+                type=openapi.TYPE_STRING,
+                format='uuid',
                 )
         ],
         responses={
@@ -149,7 +152,8 @@ class BranchManageruuidAPIview(APIView):
                 'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the Branch Manager",
-                type=openapi.TYPE_INTEGER
+                type=openapi.TYPE_STRING,
+format='uuid',
                 )
         ],
         responses={
@@ -190,7 +194,7 @@ class BranchManageruuidAPIview(APIView):
  
 class OwnerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=False)
+    queryset = CustomUserModel.objects.filter(is_active=True)
     parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
@@ -255,7 +259,7 @@ class OwneruuidAPIview(APIView):
                 openapi.IN_PATH,
                 description="Primary Key of the School",
                 type=openapi.TYPE_STRING,
-                format='uuid',
+format='uuid',
                 # required=False
                 )
         ],
@@ -283,7 +287,8 @@ class OwneruuidAPIview(APIView):
                 'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the School",
-                type=openapi.TYPE_INTEGER
+                type=openapi.TYPE_STRING,
+format='uuid',
                 )
         ],
         responses={
@@ -323,7 +328,8 @@ class OwneruuidAPIview(APIView):
                 'uuid',
                 openapi.IN_PATH,
                 description="Primary Key of the School",
-                type=openapi.TYPE_INTEGER
+                type=openapi.TYPE_STRING,
+format='uuid',
                 )
         ],
         responses={
