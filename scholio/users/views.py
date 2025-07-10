@@ -1,10 +1,9 @@
-from rest_framework import generics, status
+from rest_framework import status
 from rest_framework.permissions import IsAdminUser,AllowAny,OR
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.decorators import api_view
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from utils.StandardResponse import standarizedErrorResponse, standarizedSuccessResponse
@@ -12,10 +11,9 @@ from utils.StandardResponse_serializers import (
     standarizedErrorResponseSerializer,
     standarizedSuccessResponseSerializer
     )
-from schools.models import School
 from .serializers import *
 from .permissions import IsBranchManager, IsSchoolOwner
-from django.utils import timezone
+from utils.enumerations import RoleChoices
 
 # Create your views here.
 
@@ -45,7 +43,7 @@ class BranchManagerAPIview(APIView):
     def post(self, request):
         serializer = CustomUserCreateSerializer(data=request.data,created_by=request.user)
         if serializer.is_valid():
-            created_user = serializer.save(role = 'manager')
+            created_user = serializer.save(role = RoleChoices.manager)
             return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully created Branch Manager "{created_user.email}".',
@@ -192,7 +190,7 @@ class OwnerAPIview(APIView):
     def post(self, request):
         serializer = CustomUserCreateSerializer(data=request.data,created_by=request.user)
         if serializer.is_valid():
-            created_user = serializer.save(role='owner')
+            created_user = serializer.save(role=RoleChoices.owner)
             return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully created Owner "{created_user.email}"',

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth import authenticate
 from .models import *
-from drf_enum_field.fields import EnumField
+from rest_enumfield import EnumField
 from utils.enumerations import RoleChoices
 
 class CustomUserCreateSerializer(serializers.ModelSerializer):
@@ -13,7 +13,6 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
         allow_null=True,
         required=False
         )
-    role = EnumField(RoleChoices,use_enum_name=True)
 
     def validate_email(self, value):
         if CustomUserModel.objects.filter(email=value,is_active=True).exists():
@@ -84,8 +83,8 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
-    role = EnumField(RoleChoices,use_enum_name=True)
-
+    role = EnumField(RoleChoices)
+    
     class Meta:
         model = CustomUserModel
         fields = ['email','profile_pic','role'] 

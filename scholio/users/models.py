@@ -28,7 +28,8 @@ class CustomUserManager(BaseUserManager):
         if kwargs.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
         user = self.create_user(email=email,password=password,**kwargs)
-        user.role = 'admin'
+        user.role = RoleChoices.admin
+        user.save()
         return user
 
 class AutoUserFields(models.Model):
