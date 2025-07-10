@@ -3,6 +3,7 @@ from schools.models import SchoolBranch
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.conf import settings
 import uuid
+from django.utils import timezone
 
 # Create your models here.
 
@@ -12,6 +13,7 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('The Email must be set')
         email = self.normalize_email(email=email)
         user = self.model(email=email,**kwargs)
+        user.created_by(kwargs.get('created_by'))
         user.set_password(password)
         user.save()
         return user
@@ -37,26 +39,27 @@ class AutoUserFields(models.Model):
         )
 
     updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    deleted_at = models.DateTimeField(blank=True,null=True)
-
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='updated_%(class)s',
         null=True,
         blank=True
         )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='created_%(class)s',
         null=True,
         blank=True
         )
+    
+    deleted_at = models.DateTimeField(blank=True,null=True)
     deleted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='deleted_%(class)s',
         null=True,
         blank=True
@@ -88,4 +91,13 @@ class CustomUserModel(AbstractBaseUser, AutoUserFields):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
+
+    def delete(self,user):
+        self.is_active = False
+        self.deleted_by = user
+        self.deleted_at = timezone.now()
+        self.save()
+
+    def update(self,**kwargs):
+        return ''
 

@@ -26,10 +26,10 @@ class BranchManagerAPIview(APIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [OR(IsAdminUser(),IsSchoolOwner)]
+            return [IsAdminUser()]
     
     @swagger_auto_schema(
-        tags=['User Creations'],
+        tags=['User'],
         request_body=CustomUserCreateSerializer,
         responses={
             201: openapi.Response(
@@ -70,7 +70,7 @@ class BranchManageruuidAPIview(APIView):
             return [AllowAny()]
     
     @swagger_auto_schema(
-        tags=['User Details'],
+        tags=['User'],
         responses={
             200: openapi.Response(
                 'Successfully Retrieved Branch manager.',
@@ -81,16 +81,6 @@ class BranchManageruuidAPIview(APIView):
                 standarizedSuccessResponseSerializer
                 ),
         },
-        manual_parameters=[
-            openapi.Parameter(
-                'uuid',
-                openapi.IN_PATH,
-                description="Primary Key of the Branch manager",
-                type=openapi.TYPE_STRING,
-format='uuid',
-                # required=False
-                )
-        ],
     )
     def get(self, request, uuid):
         try:
@@ -107,16 +97,7 @@ format='uuid',
         )
 
     @swagger_auto_schema(
-        tags=['User Deletions'],
-        manual_parameters=[
-            openapi.Parameter(
-                'uuid',
-                openapi.IN_PATH,
-                description="Primary Key of the Branch Manager",
-                type=openapi.TYPE_STRING,
-                format='uuid',
-                )
-        ],
+        tags=['User'],
         responses={
             200: openapi.Response(
                 'Successfully Deleted Branch Manager.',
@@ -136,26 +117,14 @@ format='uuid',
                 message='Failed to delete Branch Manager.',
                 status_code=status.HTTP_404_NOT_FOUND)
 
-        manager.is_active = False
-        manager.deleted_at = timezone.now()
-        manager.deleted_by = self.request.user
-        manager.save()
+        manager.delete(self.request.user)
         return standarizedSuccessResponse(
             message=f'Successfully Deleted Branch Manager "{manager.email}"',
             status_code=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        tags=['User Updates'],
+        tags=['User'],
         request_body=CustomUserCreateSerializer,
-        manual_parameters=[
-            openapi.Parameter(
-                'uuid',
-                openapi.IN_PATH,
-                description="Primary Key of the Branch Manager",
-                type=openapi.TYPE_STRING,
-format='uuid',
-                )
-        ],
         responses={
             200: openapi.Response(
                 'Successfully updated Branch Manager.',
@@ -202,7 +171,7 @@ class OwnerAPIview(APIView):
             return [IsAdminUser()]
         
     @swagger_auto_schema(
-        tags=['User Creations'],
+        tags=['User'],
         request_body=CustomUserCreateSerializer,
         responses={
             201: openapi.Response(
@@ -246,23 +215,13 @@ class OwneruuidAPIview(APIView):
             return [AllowAny()]
         
     @swagger_auto_schema(
-        tags=['User Details'],
+        tags=['User'],
         responses={
             200: openapi.Response(
                 'Successfully Retrieved School.',
                 standarizedSuccessResponseSerializer
                 ),
         },
-        manual_parameters=[
-            openapi.Parameter(
-                'uuid',
-                openapi.IN_PATH,
-                description="Primary Key of the School",
-                type=openapi.TYPE_STRING,
-format='uuid',
-                # required=False
-                )
-        ],
     )
     def get(self, request, uuid):
         try:
@@ -281,16 +240,7 @@ format='uuid',
         )
 
     @swagger_auto_schema(
-        tags=['User Deletions'],
-        manual_parameters=[
-            openapi.Parameter(
-                'uuid',
-                openapi.IN_PATH,
-                description="Primary Key of the School",
-                type=openapi.TYPE_STRING,
-format='uuid',
-                )
-        ],
+        tags=['User'],
         responses={
             200: openapi.Response(
                 'Successfully Deleted School.',
@@ -311,27 +261,15 @@ format='uuid',
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        school_owner.is_active = False
-        school_owner.deleted_at = timezone.now()
-        school_owner.deleted_by = self.request.user
-        school_owner.save()
+        school_owner.delete(self.request.user)
         return standarizedSuccessResponse(
             message=f'Successfully Deleted School Owner"{school_owner.email}"',
             status_code=status.HTTP_200_OK
         )
 
     @swagger_auto_schema(
-        tags=['User Updates'],
+        tags=['User'],
         request_body=CustomUserCreateSerializer,
-        manual_parameters=[
-            openapi.Parameter(
-                'uuid',
-                openapi.IN_PATH,
-                description="Primary Key of the School",
-                type=openapi.TYPE_STRING,
-format='uuid',
-                )
-        ],
         responses={
             200: openapi.Response(
                 'Successfully updated school.',
@@ -405,7 +343,7 @@ class LoginAPIview(APIView):
                 )
         else:
             return standarizedErrorResponse(
-                message=serializer.error_messages,
+                message='Login Failed',
                 details=serializer.errors,
                 status_code=status.HTTP_400_BAD_REQUEST
             )
