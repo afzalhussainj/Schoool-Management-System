@@ -15,10 +15,15 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
         required=False
         )
 
+    def validate_email(self, value):
+        if CustomUserModel.objects.filter(email=value,is_active=True).exists():
+            raise serializers.ValidationError("Email already in use.")
+        return value
+    
     def create(self, validated_data):
         role = validated_data.pop('role', None)
-        request = self.context.get('request')
-        created_by = request.user if request and request.user.is_authenticated else None
+        profile_pic = validated_data.pop('profile_pic', None)
+        created_by = self.context.get('created_by')
         user = CustomUserModel.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
@@ -26,12 +31,31 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
             )
         if role:
             user.role = role
+        if profile_pic:
+            user.profile_pic = profile_pic
         user.save()
         return user
 
     class Meta:
         model = CustomUserModel
         fields = ['email','password','profile_pic']
+
+
+class CustomUserUpdateSerializer(CustomUserCreateSerializer):
+    def update(self, instance, validated_data):
+
+        for field,value in validated_data.items():
+            setattr(instance,field,value)
+
+        updated_by = self.context.get('updated_by')
+        instance.updated_by = updated_by
+        instance.save()
+        return instance
+
+    class Meta:
+        model = CustomUserModel
+        fields = ['email','profile_pic','role']
+
 
 class LoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type':'password'})

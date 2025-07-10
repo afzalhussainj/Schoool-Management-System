@@ -43,7 +43,7 @@ class BranchManagerAPIview(APIView):
         }
     )
     def post(self, request):
-        serializer = CustomUserCreateSerializer(data=request.data)
+        serializer = CustomUserCreateSerializer(data=request.data,created_by=request.user)
         if serializer.is_valid():
             created_user = serializer.save(role = 'manager')
             return standarizedSuccessResponse(
@@ -62,10 +62,10 @@ class BranchManageruuidAPIview(APIView):
     queryset = CustomUserModel.objects.filter(is_active=True)
 
     def get_permissions(self):
-        if self.request.method == 'PUT':
-            return [OR(IsAdminUser(),IsSchoolOwner)]
+        if self.request.method == 'PATCH':
+            return [IsAdminUser()]
         if self.request.method == 'DELETE':
-            return [OR(IsAdminUser(),IsSchoolOwner)]
+            return [IsAdminUser()]
         if self.request.method == 'GET':
             return [AllowAny()]
     
@@ -140,19 +140,24 @@ class BranchManageruuidAPIview(APIView):
                 ),
         }
     )
-    def put(self, request, uuid, format=None):
+    def patch(self, request, uuid):
         try:
             current_bm = self.queryset.get(uuid=uuid)
         except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
                 message="Branch Manager does'nt exist.",
                 status_code=status.HTTP_404_NOT_FOUND)
-        serializer = CustomUserCreateSerializer(current_bm, data=request.data)
+        serializer = CustomUserUpdateSerializer(
+            current_bm,
+            data=request.data,
+            partial=True,
+            context={'updated_by':request.user}
+            )
         if serializer.is_valid():
-            updated_bm = serializer.save()
+            serializer.save()
             return standarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully updated Branch Manager "{updated_bm.email}"',
+                message=f'Successfully updated Branch Manager "{serializer.instance.email}"',
                 status_code=status.HTTP_200_OK)
         else:
             return standarizedErrorResponse(
@@ -185,7 +190,7 @@ class OwnerAPIview(APIView):
         }
     )
     def post(self, request):
-        serializer = CustomUserCreateSerializer(data=request.data)
+        serializer = CustomUserCreateSerializer(data=request.data,created_by=request.user)
         if serializer.is_valid():
             created_user = serializer.save(role='owner')
             return standarizedSuccessResponse(
@@ -207,7 +212,7 @@ class OwneruuidAPIview(APIView):
     #     return self.queryset.all()
 
     def get_permissions(self):
-        if self.request.method == 'PUT':
+        if self.request.method == 'PATCH':
             return [IsAdminUser()]
         if self.request.method == 'DELETE':
             return [IsAdminUser()]
@@ -285,24 +290,29 @@ class OwneruuidAPIview(APIView):
                 ),
         }
     )
-    def put(self, request, uuid, format=None):
+    def patch(self, request, uuid):
         try:
             current_owner = self.queryset.get(uuid=uuid)
         except CustomUserModel.DoesNotExist:
             return standarizedErrorResponse(
-                message="Owner does'nt exist.",
+                message="School owner does'nt exist.",
                 status_code=status.HTTP_404_NOT_FOUND)
-        serializer = CustomUserCreateSerializer(current_owner, data=request.data)
+        serializer = CustomUserUpdateSerializer(
+            current_owner,
+            data=request.data,
+            partial=True,
+            context={'updated_by':request.user}
+            )
         if serializer.is_valid():
-            updated_owner = serializer.save()
+            serializer.save()
             return standarizedSuccessResponse(
                 data=serializer.data,
-                message=f'Successfully updated Owner "{updated_owner.email}"',
+                message=f'Successfully updated School Owner "{serializer.instance.email}"',
                 status_code=status.HTTP_200_OK)
         else:
             return standarizedErrorResponse(
                 details=serializer.errors,
-                message=f'Failed to update Owner "{current_owner.email}".',
+                message=f'Failed to update School Owner "{current_owner.email}".',
                 status_code=status.HTTP_400_BAD_REQUEST)
  
 
