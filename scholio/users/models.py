@@ -4,6 +4,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.conf import settings
 import uuid
 from django.utils import timezone
+from utils.enumerations import RoleChoices
 
 # Create your models here.
 
@@ -76,12 +77,11 @@ class CustomUserModel(AbstractBaseUser, AutoUserFields):
         null=True,
         blank=True
         )
-    role_choices = (
-        ('admin','Main Admin'),
-        ('owner','School Owner'),
-        ('manager','Branch Manager'),
-    )
-    role = models.CharField(max_length=25,choices=role_choices)
+    
+    role = models.CharField(
+        max_length=25,
+        choices=[(e.value,e.name.title()) for e in RoleChoices]
+        )
     
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
