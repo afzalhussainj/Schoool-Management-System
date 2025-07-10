@@ -339,6 +339,8 @@ class LoginAPIview(APIView):
                 refresh = RefreshToken.for_user(user=user)
                 access = refresh.access_token
                 user_data = CustomUserDetailsSerializer(user).data
+                user.last_login = timezone.now()
+                user.save()
                 return standarizedSuccessResponse(
                     message='User Successfully logined.',
                     data={
