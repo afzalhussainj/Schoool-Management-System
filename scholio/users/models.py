@@ -57,15 +57,6 @@ class AutoUserFields(models.Model):
         null=True,
         blank=True
         )
-    
-    deleted_at = models.DateTimeField(blank=True,null=True)
-    deleted_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='deleted_%(class)s',
-        null=True,
-        blank=True
-        )
 
     class Meta:
         abstract = True
@@ -83,8 +74,6 @@ class CustomUserModel(AbstractBaseUser, AutoUserFields):
         max_length=25,
         choices=[(e.value,e.name.title()) for e in RoleChoices]
         )
-    
-    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
@@ -92,13 +81,4 @@ class CustomUserModel(AbstractBaseUser, AutoUserFields):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
-
-    def delete(self,user):
-        self.is_active = False
-        self.deleted_by = user
-        self.deleted_at = timezone.now()
-        self.save()
-
-    def update(self,**kwargs):
-        return ''
 

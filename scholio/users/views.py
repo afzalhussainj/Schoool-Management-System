@@ -123,7 +123,7 @@ class BranchManageruuidAPIview(APIView):
                 message='Failed to delete Branch Manager.',
                 status_code=status.HTTP_404_NOT_FOUND)
 
-        manager.delete(self.request.user)
+        manager.delete()
         return standarizedSuccessResponse(
             message=f'Successfully Deleted Branch Manager "{manager.email}"',
             status_code=status.HTTP_200_OK)
@@ -270,7 +270,7 @@ class OwneruuidAPIview(APIView):
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        school_owner.delete(self.request.user)
+        school_owner.delete()
         return standarizedSuccessResponse(
             message=f'Successfully Deleted School Owner"{school_owner.email}"',
             status_code=status.HTTP_200_OK
