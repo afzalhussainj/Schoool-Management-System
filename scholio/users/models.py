@@ -28,7 +28,7 @@ class CustomUserManager(BaseUserManager):
         if kwargs.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
         user = self.create_user(email=email,password=password,**kwargs)
-        user.role = RoleChoices.admin
+        user.role = RoleChoices.admin.value
         user.save()
         return user
 

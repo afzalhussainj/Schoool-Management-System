@@ -1,5 +1,10 @@
 from rest_framework import status
-from rest_framework.permissions import IsAdminUser,AllowAny,OR
+from rest_framework.permissions import (
+    IsAdminUser,
+    AllowAny,
+    OR,
+    IsAuthenticated
+    )
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -41,9 +46,11 @@ class BranchManagerAPIview(APIView):
         }
     )
     def post(self, request):
-        serializer = CustomUserCreateSerializer(data=request.data,created_by=request.user)
+        serializer = CustomUserCreateSerializer(data=request.data,context={'created_by':request.user})
         if serializer.is_valid():
-            created_user = serializer.save(role = RoleChoices.manager)
+            created_user = serializer.save(
+                role=RoleChoices.manager.value
+                )
             return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully created Branch Manager "{created_user.email}".',
@@ -58,6 +65,7 @@ class BranchManagerAPIview(APIView):
 class BranchManageruuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = CustomUserModel.objects.filter(is_active=True)
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.request.method == 'PATCH':
@@ -122,7 +130,7 @@ class BranchManageruuidAPIview(APIView):
 
     @swagger_auto_schema(
         tags=['User'],
-        request_body=CustomUserCreateSerializer,
+        request_body=CustomUserUpdateSerializer,
         responses={
             200: openapi.Response(
                 'Successfully updated Branch Manager.',
@@ -188,9 +196,9 @@ class OwnerAPIview(APIView):
         }
     )
     def post(self, request):
-        serializer = CustomUserCreateSerializer(data=request.data,created_by=request.user)
+        serializer = CustomUserCreateSerializer(data=request.data,context={'created_by':request.user})
         if serializer.is_valid():
-            created_user = serializer.save(role=RoleChoices.owner)
+            created_user = serializer.save(role=RoleChoices.owner.value)
             return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully created Owner "{created_user.email}"',
@@ -205,9 +213,7 @@ class OwnerAPIview(APIView):
 class OwneruuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
     queryset = CustomUserModel.objects.filter(is_active=True)
-
-    # def get_queryset(self):
-    #     return self.queryset.all()
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.request.method == 'PATCH':
@@ -272,7 +278,7 @@ class OwneruuidAPIview(APIView):
 
     @swagger_auto_schema(
         tags=['User'],
-        request_body=CustomUserCreateSerializer,
+        request_body=CustomUserUpdateSerializer,
         responses={
             200: openapi.Response(
                 'Successfully updated school.',
@@ -357,4 +363,76 @@ class LoginAPIview(APIView):
                 details=serializer.errors,
                 status_code=status.HTTP_400_BAD_REQUEST
             )
+        
+
+class PasswordChangeAPIview(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[JWTAuthentication]
+
+    @swagger_auto_schema(
+        tags=['Password'],
+        request_body=PasswordChangeSerializer,
+        responses={
+            200: openapi.Response(
+                'Successfully Changed password.',
+                standarizedSuccessResponseSerializer
+                ),
+            400: openapi.Response(
+                'Failed to Changed password.',
+                standarizedErrorResponseSerializer
+                ),
+            404: openapi.Response(
+                'User not found.',
+                standarizedErrorResponseSerializer
+                ),
+            403: openapi.Response(
+                'Unauthenticated request.',
+                standarizedErrorResponseSerializer
+                ),
+        }
+    )
+    def patch(self, request, uuid):
+        try:
+            target_user = CustomUserModel.objects.get(uuid=uuid,is_active=True)
+            if (
+                request.user.role == RoleChoices.admin.value
+                or
+                request.user == target_user
+                ):
+                serializer = PasswordChangeSerializer(data=request.data)
+                if serializer.is_valid():
+                    old_password = serializer.validated_data.get('old_password')
+                    new_password = serializer.validated_data.get('new_password')
+                    if target_user.check_password(old_password):
+                        target_user.set_password(new_password)
+                        target_user.save()
+                        return standarizedSuccessResponse(
+                             message='Successfully changed password.',
+                            data={},
+                            status_code=status.HTTP_200_OK
+                            )
+                    else:
+                        return standarizedErrorResponse(
+                            message='Failed to change password',
+                            details={'incorrect password':'old password is not correct'},
+                            status_code=status.HTTP_400_BAD_REQUEST
+                            )
+                else:
+                    return standarizedErrorResponse(
+                        message='Failed to change password.',
+                        details=serializer.errors,
+                        status_code=status.HTTP_400_BAD_REQUEST
+                    )
+            else:
+                return standarizedErrorResponse(
+                    message='Unable to change password.',
+                    details={'unauthenticated_request':'Unable to authenticate request'},
+                    status_code=status.HTTP_403_FORBIDDEN
+                    )
+        except CustomUserModel.DoesNotExist:
+            return standarizedErrorResponse(
+                message='Failed to change password',
+                details={'user_not_found':'User does not exists.'},
+                status_code=status.HTTP_404_NOT_FOUND
+                )
 

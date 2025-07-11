@@ -10,7 +10,10 @@ from rest_framework import routers
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework.permissions import AllowAny
-from users.views import LoginAPIview
+from users.views import (
+    LoginAPIview, 
+    PasswordChangeAPIview
+    )
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -28,12 +31,13 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('login/',LoginAPIview.as_view(),name='login'),
+    path('pswrd-change/<uuid:uuid>',PasswordChangeAPIview.as_view(),name='password-change'),
     path('users/',include('users.urls')),
     path('schools/',include('schools.urls')),
 
     #JWT
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
 
     #swagger
     path('api-docs/', schema_view.with_ui('swagger', cache_timeout=0), name='api-docs'),

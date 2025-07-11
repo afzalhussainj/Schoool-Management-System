@@ -7,6 +7,9 @@ from utils.enumerations import RoleChoices
 
 class CustomUserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(
+        validators=[]
+    )
     profile_pic = serializers.ImageField(
         max_length=None,
         use_url=True,
@@ -20,20 +23,30 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
         return value
     
     def create(self, validated_data):
-        role = validated_data.pop('role', None)
-        profile_pic = validated_data.pop('profile_pic', None)
-        created_by = self.context.get('created_by')
-        user = CustomUserModel.objects.create_user(
-            email=validated_data['email'],
-            password=validated_data['password'],
-            created_by = created_by
-            )
-        if role:
-            user.role = role
-        if profile_pic:
-            user.profile_pic = profile_pic
-        user.save()
-        return user
+        try:
+            existed_user = CustomUserModel.objects.get(email=validated_data['email'])
+            existed_user.is_active = True
+            password = validated_data.pop('password')
+            for field,value in validated_data.items():
+                setattr(existed_user,field,value)
+            existed_user.set_password(password)
+            existed_user.save()
+            return existed_user
+        except:
+            role = validated_data.pop('role', None)
+            profile_pic = validated_data.pop('profile_pic', None)
+            created_by = self.context.get('created_by')
+            user = CustomUserModel.objects.create_user(
+                email=validated_data['email'],
+                password=validated_data['password'],
+                created_by = created_by
+                )
+            if role:
+                user.role = role
+            if profile_pic:
+                user.profile_pic = profile_pic
+            user.save()
+            return user
 
     class Meta:
         model = CustomUserModel
@@ -54,6 +67,12 @@ class CustomUserUpdateSerializer(CustomUserCreateSerializer):
     class Meta:
         model = CustomUserModel
         fields = ['email','profile_pic','role']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = False
+            field.allow_null = True
 
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -83,8 +102,24 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
-    role = EnumField(RoleChoices)
+    role = EnumField(
+        RoleChoices,
+        to_repr=lambda x: RoleChoices(int(x)).name if isinstance(x, (str, int)) else x.name
+    )
     
     class Meta:
         model = CustomUserModel
         fields = ['email','profile_pic','role'] 
+
+
+class PasswordResetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUserModel
+        fields = ['email','password']
+
+class PasswordChangeSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    class Meta:
+        model = CustomUserModel
+        fields = ['old_password','new_password']
