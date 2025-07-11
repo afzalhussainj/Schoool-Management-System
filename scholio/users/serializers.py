@@ -18,14 +18,13 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
         )
 
     def validate_email(self, value):
-        if CustomUserModel.objects.filter(email=value,is_active=True).exists():
+        if CustomUserModel.objects.filter(email=value).exists():
             raise serializers.ValidationError("Email already in use.")
         return value
     
     def create(self, validated_data):
         try:
             existed_user = CustomUserModel.objects.get(email=validated_data['email'])
-            existed_user.is_active = True
             password = validated_data.pop('password')
             for field,value in validated_data.items():
                 setattr(existed_user,field,value)
@@ -86,10 +85,7 @@ class LoginSerializer(serializers.ModelSerializer):
         if email and password:
             user = authenticate(email=email,password=password)
             if user:
-                if user.is_active:
-                    data['user'] = user
-                else:
-                    raise ValidationError('Your account is disabled.')
+                data['user'] = user
             else:
                 raise serializers.ValidationError('Wrong email or password.')
         else:

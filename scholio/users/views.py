@@ -24,7 +24,7 @@ from utils.enumerations import RoleChoices
 
 class BranchManagerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=True)
+    queryset = CustomUserModel.objects.all()
     parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
@@ -64,7 +64,7 @@ class BranchManagerAPIview(APIView):
 
 class BranchManageruuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=True)
+    queryset = CustomUserModel.objects.all()
     parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
@@ -174,7 +174,7 @@ class BranchManageruuidAPIview(APIView):
  
 class OwnerAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=True)
+    queryset = CustomUserModel.objects.all()
     parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
@@ -212,7 +212,7 @@ class OwnerAPIview(APIView):
 
 class OwneruuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=True)
+    queryset = CustomUserModel.objects.all()
     parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
@@ -323,7 +323,7 @@ class OwneruuidAPIview(APIView):
 class ListUsersAPIview(APIView):
     permission_classes=[AllowAny]
     authentication_classes=[JWTAuthentication]
-    queryset = CustomUserModel.objects.filter(is_active=True)
+    queryset = CustomUserModel.objects.all()
 
     @swagger_auto_schema(
         tags=['User'],
@@ -433,7 +433,7 @@ class PasswordChangeAPIview(APIView):
     )
     def patch(self, request, uuid):
         try:
-            target_user = CustomUserModel.objects.get(uuid=uuid,is_active=True)
+            target_user = CustomUserModel.objects.get(uuid=uuid)
             if (
                 request.user.role == RoleChoices.admin.value
                 or
