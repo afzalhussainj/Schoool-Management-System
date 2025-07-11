@@ -117,7 +117,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-# STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR,"media")
@@ -156,3 +156,9 @@ SWAGGER_SETTINGS = {
 }
 
 AUTH_USER_MODEL = 'users.CustomUserModel'
+
+# email configuration
+EMAIL_HOST = os.getenv("email_host")
+EMAIL_HOST_USER = os.getenv("email_host_user")
+EMAIL_HOST_PASSWORD = os.getenv("email_host_password")
+EMAIL_PORT = os.getenv("email_port")

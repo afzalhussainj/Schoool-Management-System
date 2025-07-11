@@ -23,29 +23,20 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
         return value
     
     def create(self, validated_data):
-        try:
-            existed_user = CustomUserModel.objects.get(email=validated_data['email'])
-            password = validated_data.pop('password')
-            for field,value in validated_data.items():
-                setattr(existed_user,field,value)
-            existed_user.set_password(password)
-            existed_user.save()
-            return existed_user
-        except:
-            role = validated_data.pop('role', None)
-            profile_pic = validated_data.pop('profile_pic', None)
-            created_by = self.context.get('created_by')
-            user = CustomUserModel.objects.create_user(
-                email=validated_data['email'],
-                password=validated_data['password'],
-                created_by = created_by
-                )
-            if role:
-                user.role = role
-            if profile_pic:
-                user.profile_pic = profile_pic
-            user.save()
-            return user
+        role = validated_data.pop('role', None)
+        profile_pic = validated_data.pop('profile_pic', None)
+        created_by = self.context.get('created_by')
+        user = CustomUserModel.objects.create_user(
+            email=validated_data['email'],
+            password=validated_data['password'],
+            created_by = created_by
+            )
+        if role:
+            user.role = role
+        if profile_pic:
+            user.profile_pic = profile_pic
+        user.save()
+        return user
 
     class Meta:
         model = CustomUserModel
@@ -111,7 +102,7 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
 class PasswordResetSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUserModel
-        fields = ['email','password']
+        fields = ['email']
 
 class PasswordChangeSerializer(serializers.ModelSerializer):
     old_password = serializers.CharField(required=True)

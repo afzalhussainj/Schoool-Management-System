@@ -17,7 +17,7 @@ from .permissions import IsBranchManager,IsSchoolOwner
 
 class SchoolAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = School.objects.filter(isdeleted=False)
+    queryset = School.objects.all()
 
     def get_queryset(self):
         return self.queryset.all()
@@ -77,7 +77,7 @@ class SchoolAPIView(APIView):
 
 class SchooluuidAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = School.objects.filter(isdeleted=False)
+    queryset = School.objects.all()
 
     def get_permissions(self):
         if self.request.method == 'PUT':
@@ -207,7 +207,7 @@ class SchooluuidAPIView(APIView):
 
 class SchoolBranchAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = SchoolBranch.objects.filter(isdeleted=False)
+    queryset = SchoolBranch.objects.all()
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -244,7 +244,7 @@ class SchoolBranchAPIview(APIView):
 
 class SchoolBranchuuidAPIview(APIView):
     authentication_classes = [JWTAuthentication]
-    queryset = SchoolBranch.objects.filter(isdeleted=False)
+    queryset = SchoolBranch.objects.all()
 
     def get_permissions(self):
         if self.request.method == 'PUT':
