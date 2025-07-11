@@ -329,7 +329,7 @@ class ListUsersAPIview(APIView):
         tags=['User'],
         responses={
             200: openapi.Response(
-                'Reyrieved users.',
+                'Retrieved users.',
                 standarizedSuccessResponseSerializer
                 ),
         },
@@ -346,14 +346,14 @@ class ListUsersAPIview(APIView):
     )
     def get(self, request):
         role = request.query_params.get('role',None)
-        users = self.queryset
+        users = self.queryset.all()
         if role:
             users = users.filter(role=role)
-        serializer = CustomUserDetailsSerializer(data=users,many=True)
+        serializer = CustomUserDetailsSerializer(users,many=True)
         return standarizedSuccessResponse(
             message='Successfully Reyrieved users.',
                     data={
-                        serializer.data
+                        'users':serializer.data
                     },
                     status_code=status.HTTP_200_OK
                     )
