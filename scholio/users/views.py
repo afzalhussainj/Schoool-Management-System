@@ -320,6 +320,46 @@ class OwneruuidAPIview(APIView):
                 status_code=status.HTTP_400_BAD_REQUEST)
  
 
+class ListUsersAPIview(APIView):
+    permission_classes=[AllowAny]
+    authentication_classes=[JWTAuthentication]
+    queryset = CustomUserModel.objects.filter(is_active=True)
+
+    @swagger_auto_schema(
+        tags=['User'],
+        responses={
+            200: openapi.Response(
+                'Reyrieved users.',
+                standarizedSuccessResponseSerializer
+                ),
+        },
+        manual_parameters=[
+            openapi.Parameter(
+                'role',
+                openapi.IN_QUERY,
+                description='Role of the user: ' + ', '.join([f"{role.name}({role.value})" for role in RoleChoices]),
+                type= openapi.TYPE_INTEGER,
+                enum=[i.value for i in RoleChoices],
+                required=False
+            )
+        ]
+    )
+    def get(self, request):
+        role = request.query_params.get('role',None)
+        users = self.queryset
+        if role:
+            users = users.filter(role=role)
+        serializer = CustomUserDetailsSerializer(data=users,many=True)
+        return standarizedSuccessResponse(
+            message='Successfully Reyrieved users.',
+                    data={
+                        serializer.data
+                    },
+                    status_code=status.HTTP_200_OK
+                    )
+
+
+
 class LoginAPIview(APIView):
     permission_classes=[AllowAny]
 
