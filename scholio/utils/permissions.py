@@ -7,13 +7,18 @@ class IsSchoolOwner(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return bool(
+        print("User:", request.user)
+        print("Is Authenticated:", request.user.is_authenticated)
+        print("Role:", request.user.role)
+        print("Is Staff:", request.user.is_staff)
+
+        return (
             request.user 
             and 
             request.user.is_authenticated
             and 
-            request.user.role == RoleChoices.owner
-            )
+            request.user.role == str(RoleChoices.owner.value)
+        )
 
 
 class IsBranchManager(BasePermission):
@@ -27,7 +32,7 @@ class IsBranchManager(BasePermission):
             and 
             request.user.is_authenticated
             and 
-            request.user.role == RoleChoices.manager
+            request.user.role == RoleChoices.manager.value
             )
     
     
@@ -37,7 +42,9 @@ class IsAdminOrSchoolOwner(BasePermission):
             request.user
             and request.user.is_authenticated
             and (
-                request.user.is_staff or request.user.role == RoleChoices.owner
+                request.user.is_staff
+                or
+                request.user.role == str(RoleChoices.owner.value)
             )
         )
     
@@ -48,6 +55,8 @@ class IsAdminOrManager(BasePermission):
             request.user
             and request.user.is_authenticated
             and (
-                request.user.is_staff or request.user.role == RoleChoices.manager
+                request.user.is_staff 
+                or 
+                request.user.role == RoleChoices.manager.value
             )
         )
