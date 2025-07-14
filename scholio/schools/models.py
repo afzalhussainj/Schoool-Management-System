@@ -8,7 +8,10 @@ class School(models.Model):
     owner = models.OneToOneField(
         CustomUserModel,
         related_name='school',
-        limit_choices_to={'role': RoleChoices.owner.value}
+        limit_choices_to={'role': RoleChoices.owner.value},
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
 
 class SchoolBranch(models.Model):
@@ -17,11 +20,16 @@ class SchoolBranch(models.Model):
     school = models.ForeignKey(
         School,
         on_delete=models.CASCADE,
-        related_name='school_branch'
+        related_name='school_branch',
+        null=True,
+        blank=True
         )
-    manager = models.OneToOneRel(
+    manager = models.OneToOneField(
         CustomUserModel,
         limit_choices_to={'role':RoleChoices.manager.value},
-        related_name='branch'
+        related_name='branch',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     

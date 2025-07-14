@@ -32,6 +32,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('login/',LoginAPIview.as_view(),name='login'),
     path('pswrd-change/<uuid:uuid>',PasswordChangeAPIview.as_view(),name='password-change'),
+    path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('users/',include('users.urls')),
     path('schools/',include('schools.urls')),
 

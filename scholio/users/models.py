@@ -1,5 +1,4 @@
 from django.db import models
-from schools.models import SchoolBranch
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.conf import settings
 import uuid

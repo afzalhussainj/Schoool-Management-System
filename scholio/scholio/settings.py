@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'drf_yasg',
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
@@ -158,7 +159,10 @@ SWAGGER_SETTINGS = {
 AUTH_USER_MODEL = 'users.CustomUserModel'
 
 # email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
 EMAIL_HOST = os.getenv("email_host")
 EMAIL_HOST_USER = os.getenv("email_host_user")
 EMAIL_HOST_PASSWORD = os.getenv("email_host_password")
 EMAIL_PORT = os.getenv("email_port")
+
