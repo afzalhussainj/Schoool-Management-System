@@ -17,7 +17,7 @@ from utils.StandardResponse_serializers import (
     standarizedSuccessResponseSerializer
     )
 from .serializers import *
-from .permissions import IsBranchManager, IsSchoolOwner
+from utils.permissions import *
 from utils.enumerations import RoleChoices
 
 # Create your views here.
@@ -29,7 +29,7 @@ class BranchManagerAPIview(APIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [OR(IsAdminUser(),IsSchoolOwner())]
+            return [IsAdminOrSchoolOwner()]
     
     @swagger_auto_schema(
         tags=['User'],

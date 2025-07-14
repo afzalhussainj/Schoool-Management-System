@@ -13,7 +13,7 @@ from utils.StandardResponse_serializers import (
     )
 from .serializers import *
 from .models import School
-from .permissions import IsBranchManager,IsSchoolOwner
+from utils.permissions import *
 from rest_framework.permissions import (
     OR,
     AllowAny,
@@ -216,7 +216,7 @@ class SchoolBranchAPIview(APIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [IsAdminUser()|IsSchoolOwner]
+            return [IsAdminOrSchoolOwner()]
 
     @swagger_auto_schema(
         tags=['school'],
@@ -252,10 +252,8 @@ class SchoolBranchuuidAPIview(APIView):
     queryset = SchoolBranch.objects.all()
 
     def get_permissions(self):
-        if self.request.method == 'PUT':
-            return [IsAdminUser()|IsSchoolOwner]
-        if self.request.method == 'DELETE':
-            return [IsAdminUser()|IsSchoolOwner]
+        if self.request.method == 'PUT' or self.request.method == 'DELETE':
+            return [IsAdminOrSchoolOwner()]
         if self.request.method == 'GET':
             return [AllowAny()]
 
