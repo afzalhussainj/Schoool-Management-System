@@ -1,8 +1,14 @@
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.permissions import (
+    OR,
+    AllowAny,
+    IsAdminUser
+    )
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from utils.permissions import *
 from utils.StandardResponse import (
     standarizedErrorResponse,
     standarizedSuccessResponse
@@ -13,12 +19,6 @@ from utils.StandardResponse_serializers import (
     )
 from .serializers import *
 from .models import School
-from utils.permissions import *
-from rest_framework.permissions import (
-    OR,
-    AllowAny,
-    IsAdminUser
-    )
 
 class SchoolAPIView(APIView):
     authentication_classes = [JWTAuthentication]

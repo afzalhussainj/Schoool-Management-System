@@ -359,7 +359,6 @@ class ListUsersAPIview(APIView):
                     )
 
 
-
 class LoginAPIview(APIView):
     permission_classes=[AllowAny]
 

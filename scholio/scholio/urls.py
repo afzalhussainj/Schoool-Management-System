@@ -1,20 +1,21 @@
 from django.contrib import admin
-from django.conf.urls.static import static
 from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path, include
+from rest_framework import routers
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from rest_framework import routers
-from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from rest_framework.permissions import AllowAny
+from drf_yasg.views import get_schema_view
 from users.views import (
     LoginAPIview, 
     PasswordChangeAPIview
     )
 
+# swagger ui schema view
 schema_view = get_schema_view(
     openapi.Info(
         title="Your API",
@@ -33,6 +34,8 @@ urlpatterns = [
     path('login/',LoginAPIview.as_view(),name='login'),
     path('pswrd-change/<uuid:uuid>',PasswordChangeAPIview.as_view(),name='password-change'),
     path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+
+    # apps
     path('users/',include('users.urls')),
     path('schools/',include('schools.urls')),
 

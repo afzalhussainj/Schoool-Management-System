@@ -2,7 +2,6 @@ from django.db import models
 from users.models import CustomUserModel
 from utils.enumerations import RoleChoices
 
-# Create your models here.
 class School(models.Model):
     name = models.CharField(max_length=200)
     owner = models.OneToOneField(
@@ -13,6 +12,7 @@ class School(models.Model):
         null=True,
         blank=True,
     )
+
 
 class SchoolBranch(models.Model):
     branch_name = models.CharField(max_length=200)
