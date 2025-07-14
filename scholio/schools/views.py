@@ -1,4 +1,4 @@
-from rest_framework import permissions,status
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg import openapi
@@ -14,6 +14,11 @@ from utils.StandardResponse_serializers import (
 from .serializers import *
 from .models import School
 from .permissions import IsBranchManager,IsSchoolOwner
+from rest_framework.permissions import (
+    OR,
+    AllowAny,
+    IsAdminUser
+    )
 
 class SchoolAPIView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -24,13 +29,13 @@ class SchoolAPIView(APIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [permissions.IsAdminUser()]
+            return [IsAdminUser()]
         if self.request.method == 'GET':
-            return [permissions.AllowAny()]
+            return [AllowAny()]
 
     @swagger_auto_schema(
-        auto_schema=None,
-        request_body=SchoolSerializer,
+        tags=['school'],
+        request_body=SchoolCreateSerializer,
         responses={
             201: openapi.Response(
                 'Successfully created School.',
@@ -43,7 +48,7 @@ class SchoolAPIView(APIView):
         }
     )
     def post(self, request):
-        serializer = SchoolSerializer(data=request.data)
+        serializer = SchoolCreateSerializer(data=request.data)
         if serializer.is_valid():
             created_school = serializer.save()
             return standarizedSuccessResponse(
@@ -67,7 +72,7 @@ class SchoolAPIView(APIView):
         }
     )
     def get(self, request):
-        serializer = SchoolSerializer(self.get_queryset(),many=True)
+        serializer = SchoolCreateSerializer(self.get_queryset(),many=True)
         return standarizedSuccessResponse(
             data=serializer.data,
             message=f'Successfully listed available School.',
@@ -81,11 +86,11 @@ class SchooluuidAPIView(APIView):
 
     def get_permissions(self):
         if self.request.method == 'PUT':
-            return [permissions.IsAdminUser()]
+            return [IsAdminUser()]
         if self.request.method == 'DELETE':
-            return [permissions.IsAdminUser()]
+            return [IsAdminUser()]
         if self.request.method == 'GET':
-            return [permissions.AllowAny()]
+            return [AllowAny()]
     
     @swagger_auto_schema(
         auto_schema=None,
@@ -114,7 +119,7 @@ class SchooluuidAPIView(APIView):
                 status_code=status.HTTP_404_NOT_FOUND
                 )
             
-        serializer = SchoolSerializer(school)
+        serializer = SchoolCreateSerializer(school)
         return standarizedSuccessResponse(
             data=serializer.data,
             message=f'Successfully retrieved Available School.',
@@ -158,7 +163,7 @@ class SchooluuidAPIView(APIView):
 
     @swagger_auto_schema(
         auto_schema=None,
-        request_body=SchoolSerializer,
+        request_body=SchoolCreateSerializer,
         manual_parameters=[
             openapi.Parameter(
                 'uuid',
@@ -190,7 +195,7 @@ class SchooluuidAPIView(APIView):
                 status_code=status.HTTP_404_NOT_FOUND
             )
 
-        serializer = SchoolSerializer(school, data=request.data)
+        serializer = SchoolCreateSerializer(school, data=request.data)
         if serializer.is_valid():
             updated_school = serializer.save()
             return standarizedSuccessResponse(
@@ -211,7 +216,7 @@ class SchoolBranchAPIview(APIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [permissions.IsAdminUser()|IsSchoolOwner]
+            return [IsAdminUser()|IsSchoolOwner]
 
     @swagger_auto_schema(
         auto_schema=None,
@@ -248,11 +253,11 @@ class SchoolBranchuuidAPIview(APIView):
 
     def get_permissions(self):
         if self.request.method == 'PUT':
-            return [permissions.IsAdminUser()|IsSchoolOwner]
+            return [IsAdminUser()|IsSchoolOwner]
         if self.request.method == 'DELETE':
-            return [permissions.IsAdminUser()|IsSchoolOwner]
+            return [IsAdminUser()|IsSchoolOwner]
         if self.request.method == 'GET':
-            return [permissions.AllowAny()]
+            return [AllowAny()]
 
     @swagger_auto_schema(
         auto_schema=None,
@@ -281,7 +286,7 @@ class SchoolBranchuuidAPIview(APIView):
                 status_code=status.HTTP_404_NOT_FOUND
                 )
             
-        serializer = SchoolSerializer(branch)
+        serializer = SchoolCreateSerializer(branch)
 
         return standarizedSuccessResponse(
             data=serializer.data,
@@ -345,7 +350,7 @@ class SchoolBranchuuidAPIview(APIView):
             return standarizedErrorResponse(
                 message="School branch does'nt exist.",
                 status_code=status.HTTP_404_NOT_FOUND)
-        serializer = SchoolSerializer(current_branch, data=request.data)
+        serializer = SchoolCreateSerializer(current_branch, data=request.data)
         if serializer.is_valid():
             updated_branch = serializer.save()
             return standarizedSuccessResponse(
