@@ -219,8 +219,8 @@ class SchoolBranchAPIview(APIView):
             return [IsAdminUser()|IsSchoolOwner]
 
     @swagger_auto_schema(
-        auto_schema=None,
-        request_body=SchoolBranchSerializer,
+        tags=['school'],
+        request_body=SchoolBranchCreateSerializer,
         responses={
             201: openapi.Response(
                 'Successfully created School.',
@@ -233,7 +233,7 @@ class SchoolBranchAPIview(APIView):
         }
     )
     def post(self, request):
-        serializer = SchoolBranchSerializer(data=request.data)
+        serializer = SchoolBranchCreateSerializer(data=request.data)
         if serializer.is_valid():
             created_branch = serializer.save()
             return standarizedSuccessResponse(
@@ -319,7 +319,7 @@ class SchoolBranchuuidAPIview(APIView):
 
     @swagger_auto_schema(
         auto_schema=None,
-        request_body=SchoolBranchSerializer,
+        request_body=SchoolBranchCreateSerializer,
         manual_parameters=[
             openapi.Parameter(
                 'uuid',

@@ -29,7 +29,7 @@ class BranchManagerAPIview(APIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [IsAdminUser()]
+            return [OR(IsAdminUser(),IsSchoolOwner())]
     
     @swagger_auto_schema(
         tags=['User'],

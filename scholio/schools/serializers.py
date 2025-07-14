@@ -7,7 +7,7 @@ class SchoolCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SchoolBranchSerializer(serializers.ModelSerializer):
+class SchoolBranchCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = SchoolBranch
         fields = '__all__'

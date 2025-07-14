@@ -12,7 +12,7 @@ class IsSchoolOwner(permissions.BasePermission):
             and 
             request.user.is_authenticated
             and 
-            request.use.role == 'manager'
+            request.user.role == RoleChoices.owner
             )
     
 class IsBranchManager(permissions.BasePermission):
@@ -26,5 +26,6 @@ class IsBranchManager(permissions.BasePermission):
             and 
             request.user.is_authenticated
             and 
-            request.use.role == 'manager'
+            request.user.role == RoleChoices.manager
             )
+    
