@@ -38,6 +38,7 @@ urlpatterns = [
     # apps
     path('users/',include('users.urls')),
     path('schools/',include('schools.urls')),
+    path('members/',include('members.urls')),
 
     #JWT
     path('token/', TokenObtainPairView.as_view(), name='token-obtain-pair'),

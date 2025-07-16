@@ -27,6 +27,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'schools.apps.SchoolsConfig',
     'users.apps.UsersConfig',
+    'members.apps.MembersConfig',
     'rest_framework',
     "django.contrib.admin",
     "django.contrib.auth",
