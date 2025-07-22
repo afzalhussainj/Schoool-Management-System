@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 from django.contrib.auth import authenticate
 from .models import *
 from rest_enumfield import EnumField
-from utils.enumerations import RoleChoices
+from utils.enumerations import RoleChoicesUsers
 
 class CustomUserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -90,8 +90,8 @@ class LoginSerializer(serializers.ModelSerializer):
 
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
     role = EnumField(
-        RoleChoices,
-        to_repr=lambda x: RoleChoices(int(x)).name if isinstance(x, (str, int)) else x.name
+        RoleChoicesUsers,
+        to_repr=lambda x: RoleChoicesUsers(int(x)).name if isinstance(x, (str, int)) else x.name
     )
     
     class Meta:

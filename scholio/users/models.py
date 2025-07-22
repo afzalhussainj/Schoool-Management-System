@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.conf import settings
-import uuid
 from django.utils import timezone
-from utils.enumerations import RoleChoices
+from utils.enumerations import RoleChoicesUsers
+from utils.AutoFields import AutoFields
 
 # Create your models here.
 
@@ -26,41 +26,11 @@ class CustomUserManager(BaseUserManager):
         if kwargs.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
         user = self.create_user(email=email,password=password,**kwargs)
-        user.role = RoleChoices.admin.value
+        user.role = RoleChoicesUsers.admin.value
         user.save()
         return user
 
-class AutoUserFields(models.Model):
-    id = models.AutoField(primary_key=True)
-    uuid = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        unique=True
-        )
-
-    updated_at = models.DateTimeField(auto_now=True)
-    updated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='updated_%(class)s',
-        null=True,
-        blank=True
-        )
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='created_%(class)s',
-        null=True,
-        blank=True
-        )
-
-    class Meta:
-        abstract = True
-
-
-class CustomUserModel(AbstractBaseUser, AutoUserFields):
+class CustomUserModel(AbstractBaseUser, AutoFields):
     email = models.EmailField(blank=False, unique=True)
     profile_pic = models.ImageField(
         upload_to="profile_pics/",
@@ -70,7 +40,7 @@ class CustomUserModel(AbstractBaseUser, AutoUserFields):
     
     role = models.CharField(
         max_length=25,
-        choices=[(e.value,e.name.title()) for e in RoleChoices]
+        choices=[(e.value,e.name.title()) for e in RoleChoicesUsers]
         )
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)

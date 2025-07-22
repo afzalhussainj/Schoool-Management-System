@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from users.models import RoleChoices
+from users.models import RoleChoicesUsers
 
 class IsSchoolOwner(BasePermission):
     """
@@ -17,7 +17,7 @@ class IsSchoolOwner(BasePermission):
             and 
             request.user.is_authenticated
             and 
-            request.user.role == str(RoleChoices.owner.value)
+            request.user.role == str(RoleChoicesUsers.owner.value)
         )
 
 
@@ -32,7 +32,7 @@ class IsBranchManager(BasePermission):
             and 
             request.user.is_authenticated
             and 
-            request.user.role == RoleChoices.manager.value
+            request.user.role == RoleChoicesUsers.manager.value
             )
     
     
@@ -44,7 +44,7 @@ class IsAdminOrSchoolOwner(BasePermission):
             and (
                 request.user.is_staff
                 or
-                request.user.role == str(RoleChoices.owner.value)
+                request.user.role == str(RoleChoicesUsers.owner.value)
             )
         )
     
@@ -57,6 +57,6 @@ class IsAdminOrManager(BasePermission):
             and (
                 request.user.is_staff 
                 or 
-                request.user.role == RoleChoices.manager.value
+                request.user.role == RoleChoicesUsers.manager.value
             )
         )

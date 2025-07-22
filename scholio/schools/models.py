@@ -1,13 +1,13 @@
 from django.db import models
 from users.models import CustomUserModel
-from utils.enumerations import RoleChoices
+from utils.enumerations import RoleChoicesUsers
 
 class School(models.Model):
     name = models.CharField(max_length=200)
     owner = models.OneToOneField(
         CustomUserModel,
         related_name='school',
-        limit_choices_to={'role': RoleChoices.owner.value},
+        limit_choices_to={'role': RoleChoicesUsers.owner.value},
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -26,7 +26,7 @@ class SchoolBranch(models.Model):
         )
     manager = models.OneToOneField(
         CustomUserModel,
-        limit_choices_to={'role':RoleChoices.manager.value},
+        limit_choices_to={'role':RoleChoicesUsers.manager.value},
         related_name='branch',
         on_delete=models.SET_NULL,
         null=True,

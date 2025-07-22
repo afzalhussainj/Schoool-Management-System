@@ -18,7 +18,7 @@ from utils.StandardResponse_serializers import (
     )
 from .serializers import *
 from utils.permissions import *
-from utils.enumerations import RoleChoices
+from utils.enumerations import RoleChoicesUsers
 
 # Create your views here.
 
@@ -49,7 +49,7 @@ class BranchManagerAPIview(APIView):
         serializer = CustomUserCreateSerializer(data=request.data,context={'created_by':request.user})
         if serializer.is_valid():
             created_user = serializer.save(
-                role=RoleChoices.manager.value
+                role=RoleChoicesUsers.manager.value
                 )
             return standarizedSuccessResponse(
                 data=serializer.data,
@@ -198,7 +198,7 @@ class OwnerAPIview(APIView):
     def post(self, request):
         serializer = CustomUserCreateSerializer(data=request.data,context={'created_by':request.user})
         if serializer.is_valid():
-            created_user = serializer.save(role=RoleChoices.owner.value)
+            created_user = serializer.save(role=RoleChoicesUsers.owner.value)
             return standarizedSuccessResponse(
                 data=serializer.data,
                 message=f'Successfully created Owner "{created_user.email}"',
@@ -337,9 +337,9 @@ class ListUsersAPIview(APIView):
             openapi.Parameter(
                 'role',
                 openapi.IN_QUERY,
-                description='Role of the user: ' + ', '.join([f"{role.name}({role.value})" for role in RoleChoices]),
+                description='Role of the user: ' + ', '.join([f"{role.name}({role.value})" for role in RoleChoicesUsers]),
                 type= openapi.TYPE_INTEGER,
-                enum=[i.value for i in RoleChoices],
+                enum=[i.value for i in RoleChoicesUsers],
                 required=False
             )
         ]
@@ -434,7 +434,7 @@ class PasswordChangeAPIview(APIView):
         try:
             target_user = CustomUserModel.objects.get(uuid=uuid)
             if (
-                request.user.role == RoleChoices.admin.value
+                request.user.role == RoleChoicesUsers.admin.value
                 or
                 request.user == target_user
                 ):
